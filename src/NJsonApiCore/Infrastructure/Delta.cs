@@ -5,16 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using NJsonApi.Conventions.Impl;
 
 namespace NJsonApi.Infrastructure
 {
     public class Delta<T> : IDelta<T> where T : new()
     {
-        private readonly Dictionary<string, Action<T, object>> currentTypeSetters;
-        private readonly Dictionary<string, Action<T, object>> typeSettersTemplates;
+        private Dictionary<string, Action<T, object>> currentTypeSetters;
+        private Dictionary<string, Action<T, object>> typeSettersTemplates;
 
-        private readonly Dictionary<string, CollectionInfo<T>> currentCollectionInfos;
-        private readonly Dictionary<string, CollectionInfo<T>> collectionInfoTemplates;
+        private Dictionary<string, CollectionInfo<T>> currentCollectionInfos;
+        private Dictionary<string, CollectionInfo<T>> collectionInfoTemplates;
 
         public Dictionary<string, object> ObjectPropertyValues { get; set; }
         public Dictionary<string, ICollectionDelta> CollectionDeltas { get; set; }
@@ -22,6 +23,26 @@ namespace NJsonApi.Infrastructure
         public IMetaData ObjectMetaData { get; set; }
 
         public Delta()
+        {
+            //if (typeSettersTemplates == null)
+            //{
+            //    typeSettersTemplates = ScanForProperties();
+            //}
+            //if (collectionInfoTemplates == null)
+            //{
+            //    collectionInfoTemplates = ScanForCollections();
+            //}
+
+            //currentTypeSetters = typeSettersTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            //currentCollectionInfos = collectionInfoTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            ObjectPropertyValues = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+            CollectionDeltas = new Dictionary<string, ICollectionDelta>();
+            TopLevelMetaData = null;
+            ObjectMetaData = null; 
+        }
+
+        public void Scan()
         {
             if (typeSettersTemplates == null)
             {
@@ -34,19 +55,16 @@ namespace NJsonApi.Infrastructure
 
             currentTypeSetters = typeSettersTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             currentCollectionInfos = collectionInfoTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-            ObjectPropertyValues = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-            CollectionDeltas = new Dictionary<string, ICollectionDelta>();
-            TopLevelMetaData = null;
-            ObjectMetaData = null; 
         }
 
         public void FilterOut<TProperty>(params Expression<Func<T, TProperty>>[] filter)
         {
             foreach (var f in filter)
             {
-                currentTypeSetters.Remove(f.GetPropertyInfo().Name);
-                currentCollectionInfos.Remove(f.GetPropertyInfo().Name);
+                var propertyName = f.GetPropertyInfo().Name;
+                if (currentTypeSetters.ContainsKey(propertyName))
+                currentTypeSetters.Remove(propertyName);
+                currentCollectionInfos.Remove(propertyName);
             }
         }
 
@@ -122,7 +140,8 @@ namespace NJsonApi.Infrastructure
         {
             return typeof(T)
                 .GetProperties()
-                .Where(pi => !(typeof(ICollection).IsAssignableFrom(pi.PropertyType)))
+                .Where(pi => ObjectPropertyValues.ContainsKey(pi.Name))
+                //.Where(pi => !(typeof(ICollection).IsAssignableFrom(pi.PropertyType)))
                 .ToDictionary(pi => pi.Name, pi => pi.ToCompiledSetterAction<T, object>());
         }
 
@@ -130,7 +149,8 @@ namespace NJsonApi.Infrastructure
         {
             return typeof(T)
                 .GetProperties()
-                .Where(pi => (typeof(ICollection).IsAssignableFrom(pi.PropertyType)))
+                .Where(pi => CollectionDeltas.ContainsKey(pi.Name) && 
+                (typeof(ICollection).IsAssignableFrom(pi.PropertyType)))
                 .ToDictionary(pi => pi.Name, pi => new CollectionInfo<T>
                 {
                     Getter = pi.ToCompiledGetterFunc<T, ICollection>(),

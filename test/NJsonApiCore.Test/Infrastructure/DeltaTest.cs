@@ -14,14 +14,16 @@ namespace NJsonApi.Test.Infrastructure
             //Arange
             var author = new Author();
             var classUnderTest = new Delta<Author>();
-
-            classUnderTest.FilterOut(t => t.Name);
+            
             classUnderTest.ObjectPropertyValues =
                 new Dictionary<string, object>()
                 {
                     {"Id", 1},
                     {"DateTimeCreated", new DateTime(2016,1,1)}
                 };
+            classUnderTest.Scan();
+            classUnderTest.FilterOut(t => t.Name);
+
             //Act
             classUnderTest.ApplySimpleProperties(author);
 
