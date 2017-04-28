@@ -102,7 +102,6 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
 
             // Assert
             Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("Name"));
-            Console.WriteLine(resultDelta.ObjectPropertyValues["Dimensions"]);
             Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("Dimensions"));
             Assert.Equal(dimensions, resultDelta.ObjectPropertyValues["Dimensions"]);
         }
@@ -117,7 +116,6 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
                 new WidgetPart() { PartNumber = "WIDGET-001" },
                 new WidgetPart() { PartNumber = "WIDGET-002" }
             };
-            var jArrayWidgetParts = JArray.FromObject(widgetParts);
             var updateDocument = new UpdateDocument
             {
                 Data = new SingleResource()

@@ -11,31 +11,20 @@ namespace NJsonApi.Infrastructure
 {
     public class Delta<T> : IDelta<T> where T : new()
     {
-        private Dictionary<string, Action<T, object>> currentTypeSetters;
-        private Dictionary<string, Action<T, object>> typeSettersTemplates;
+        private Dictionary<string, Action<T, object>> _currentTypeSetters;
+        private Dictionary<string, Action<T, object>> _typeSettersTemplates;
 
-        private Dictionary<string, CollectionInfo<T>> currentCollectionInfos;
-        private Dictionary<string, CollectionInfo<T>> collectionInfoTemplates;
+        private Dictionary<string, CollectionInfo<T>> _currentCollectionInfos;
+        private Dictionary<string, CollectionInfo<T>> _collectionInfoTemplates;
 
         public Dictionary<string, object> ObjectPropertyValues { get; set; }
         public Dictionary<string, ICollectionDelta> CollectionDeltas { get; set; }
         public IMetaData TopLevelMetaData { get; set; }
         public IMetaData ObjectMetaData { get; set; }
+        private bool _scanned;
 
         public Delta()
         {
-            //if (typeSettersTemplates == null)
-            //{
-            //    typeSettersTemplates = ScanForProperties();
-            //}
-            //if (collectionInfoTemplates == null)
-            //{
-            //    collectionInfoTemplates = ScanForCollections();
-            //}
-
-            //currentTypeSetters = typeSettersTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            //currentCollectionInfos = collectionInfoTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
             ObjectPropertyValues = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             CollectionDeltas = new Dictionary<string, ICollectionDelta>();
             TopLevelMetaData = null;
@@ -44,27 +33,29 @@ namespace NJsonApi.Infrastructure
 
         public void Scan()
         {
-            if (typeSettersTemplates == null)
+            if (_typeSettersTemplates == null)
             {
-                typeSettersTemplates = ScanForProperties();
+                _typeSettersTemplates = ScanForProperties();
             }
-            if (collectionInfoTemplates == null)
+            if (_collectionInfoTemplates == null)
             {
-                collectionInfoTemplates = ScanForCollections();
+                _collectionInfoTemplates = ScanForCollections();
             }
 
-            currentTypeSetters = typeSettersTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-            currentCollectionInfos = collectionInfoTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            _currentTypeSetters = _typeSettersTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            _currentCollectionInfos = _collectionInfoTemplates.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            _scanned = true;
         }
 
         public void FilterOut<TProperty>(params Expression<Func<T, TProperty>>[] filter)
         {
+            ThrowExceptionIfNotScanned();
             foreach (var f in filter)
             {
                 var propertyName = f.GetPropertyInfo().Name;
-                if (currentTypeSetters.ContainsKey(propertyName))
-                currentTypeSetters.Remove(propertyName);
-                currentCollectionInfos.Remove(propertyName);
+                if (_currentTypeSetters.ContainsKey(propertyName))
+                _currentTypeSetters.Remove(propertyName);
+                _currentCollectionInfos.Remove(propertyName);
             }
         }
 
@@ -89,12 +80,13 @@ namespace NJsonApi.Infrastructure
 
         public void ApplySimpleProperties(T inputObject)
         {
+            ThrowExceptionIfNotScanned();
             if (ObjectPropertyValues == null) return;
             foreach (var objectPropertyNameValue in ObjectPropertyValues)
             {
                 Action<T, object> setter;
 
-                currentTypeSetters.TryGetValue(ToProperCase(objectPropertyNameValue.Key), out setter);
+                _currentTypeSetters.TryGetValue(ToProperCase(objectPropertyNameValue.Key), out setter);
                 if (setter != null)
                     setter(inputObject, objectPropertyNameValue.Value);
             }
@@ -102,11 +94,12 @@ namespace NJsonApi.Infrastructure
 
         public void ApplyCollections(T inputObject)
         {
+            ThrowExceptionIfNotScanned();
             if (ObjectPropertyValues == null) return;
             foreach (var colDelta in CollectionDeltas)
             {
                 CollectionInfo<T> info;
-                currentCollectionInfos.TryGetValue(ToProperCase(colDelta.Key), out info);
+                _currentCollectionInfos.TryGetValue(ToProperCase(colDelta.Key), out info);
                 if (info != null)
                 {
                     var existingCollection = info.Getter(inputObject);
@@ -141,7 +134,6 @@ namespace NJsonApi.Infrastructure
             return typeof(T)
                 .GetProperties()
                 .Where(pi => ObjectPropertyValues.ContainsKey(pi.Name))
-                //.Where(pi => !(typeof(ICollection).IsAssignableFrom(pi.PropertyType)))
                 .ToDictionary(pi => pi.Name, pi => pi.ToCompiledSetterAction<T, object>());
         }
 
@@ -164,6 +156,11 @@ namespace NJsonApi.Infrastructure
             public Type CollectionType { get; set; }
             public Func<TOwner, ICollection> Getter { get; set; }
             public Action<TOwner, ICollection> Setter { get; set; }
+        }
+
+        private void ThrowExceptionIfNotScanned()
+        {
+            if (!_scanned) throw new Exception("Scan must be called before this method");
         }
     }
 }
