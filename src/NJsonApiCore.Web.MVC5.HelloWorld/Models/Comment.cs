@@ -6,6 +6,11 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Models
 {
     public class Comment
     {
+        public Comment()
+        {
+            Id = StaticPersistentStore.GetNextId();
+        }
+
         public Comment(string body)
         {
             Id = StaticPersistentStore.GetNextId();

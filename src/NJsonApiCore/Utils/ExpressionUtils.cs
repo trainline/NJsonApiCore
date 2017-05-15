@@ -113,7 +113,12 @@ namespace NJsonApi.Utils
             {
                 if (pi.PropertyType.GetInterfaces().Any(x => x == typeof(IEnumerable)))
                 {
-                    exp = CreateJArrayTypeSetterExpression(pi, instanceParameter, valueParameter);
+                    var canConvertToJArray = Expression.Equal(Expression.TypeAs(valueParameter, typeof(JArray)),
+                        Expression.Constant(null));
+
+                    exp = Expression.IfThenElse(canConvertToJArray,
+                        CreateSimpleTypeSetterExpression(pi, instanceParameter, valueParameter),
+                        CreateJArrayTypeSetterExpression(pi, instanceParameter, valueParameter));
                 }
                 else
                 {
@@ -140,12 +145,16 @@ namespace NJsonApi.Utils
         private static Expression CreateSimpleTypeSetterExpression(PropertyInfo pi, ParameterExpression instanceParameter, ParameterExpression valueParameter)
         {
             var mi = pi.GetSetMethod();
-            Expression valueExpression = valueParameter;
 
-            if (pi.PropertyType != valueParameter.Type)
-                valueExpression = Expression.Convert(valueParameter, pi.PropertyType);
+            Expression valueExpression = pi.PropertyType == valueParameter.Type
+                 ? (Expression) valueParameter
+                 : Expression.Convert(valueParameter, pi.PropertyType);
 
-            var body = Expression.Call(instanceParameter, mi, valueExpression);
+            Expression instanceExpression = pi.DeclaringType == instanceParameter.Type
+                 ? (Expression)instanceParameter
+                 : Expression.Convert(instanceParameter, pi.DeclaringType);
+
+            var body = Expression.Call(instanceExpression, mi, valueExpression);
 
             return body;
         }
@@ -172,7 +181,11 @@ namespace NJsonApi.Utils
             var convertToJObjectExpression = Expression.Convert(valueParameter, typeof(TJTokenType));
             var toObjectCall = Expression.Call(convertToJObjectExpression, method, typeConstant);
             var convertToTargetTypeExpression = Expression.Convert(toObjectCall, pi.PropertyType);
-            var body = Expression.Call(instanceParameter, mi, convertToTargetTypeExpression);
+            var instanceExpression = pi.DeclaringType == instanceParameter.Type
+                ? (Expression)instanceParameter
+                : Expression.Convert(instanceParameter, pi.DeclaringType);
+
+            var body = Expression.Call(instanceExpression, mi, convertToTargetTypeExpression);
 
             return body;
         }

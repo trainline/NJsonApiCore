@@ -11,8 +11,10 @@ namespace NJsonApi.Infrastructure
 {
     public class Delta<T> : IDelta<T> where T : new()
     {
-        private Dictionary<string, Action<T, object>> _currentTypeSetters;
-        private Dictionary<string, Action<T, object>> _typeSettersTemplates;
+        private readonly IResourceMapping _mapping;
+
+        private Dictionary<string, Action<object, object>> _currentTypeSetters;
+        private Dictionary<string, Action<object, object>> _typeSettersTemplates;
 
         private Dictionary<string, CollectionInfo<T>> _currentCollectionInfos;
         private Dictionary<string, CollectionInfo<T>> _collectionInfoTemplates;
@@ -23,8 +25,9 @@ namespace NJsonApi.Infrastructure
         public IMetaData ObjectMetaData { get; set; }
         private bool _scanned;
 
-        public Delta()
+        public Delta(IConfiguration configuration)
         {
+            _mapping = configuration.GetMapping(typeof(T));
             ObjectPropertyValues = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             CollectionDeltas = new Dictionary<string, ICollectionDelta>();
             TopLevelMetaData = null;
@@ -73,20 +76,15 @@ namespace NJsonApi.Infrastructure
             return (TProperty)val;
         }
 
-        public static string ToProperCase(string the_string)
-        {
-            return the_string.Substring(0, 1).ToUpper() + the_string.Substring(1);
-        }
-
         public void ApplySimpleProperties(T inputObject)
         {
             ThrowExceptionIfNotScanned();
             if (ObjectPropertyValues == null) return;
             foreach (var objectPropertyNameValue in ObjectPropertyValues)
             {
-                Action<T, object> setter;
+                Action<object, object> setter;
 
-                _currentTypeSetters.TryGetValue(ToProperCase(objectPropertyNameValue.Key), out setter);
+                _currentTypeSetters.TryGetValue(objectPropertyNameValue.Key, out setter);
                 if (setter != null)
                     setter(inputObject, objectPropertyNameValue.Value);
             }
@@ -99,7 +97,7 @@ namespace NJsonApi.Infrastructure
             foreach (var colDelta in CollectionDeltas)
             {
                 CollectionInfo<T> info;
-                _currentCollectionInfos.TryGetValue(ToProperCase(colDelta.Key), out info);
+                _currentCollectionInfos.TryGetValue(colDelta.Key, out info);
                 if (info != null)
                 {
                     var existingCollection = info.Getter(inputObject);
@@ -129,26 +127,42 @@ namespace NJsonApi.Infrastructure
             return t;
         }
 
-        private Dictionary<string, Action<T, object>> ScanForProperties()
+        private Dictionary<string, Action<object, object>> ScanForProperties()
         {
-            return typeof(T)
-                .GetProperties()
-                .Where(pi => ObjectPropertyValues.ContainsKey(pi.Name))
-                .ToDictionary(pi => pi.Name, pi => pi.ToCompiledSetterAction<T, object>());
+            // set1 contains simple properties setters that are not related resources
+            var set1 = ObjectPropertyValues
+                .Where(opv => _mapping.PropertySetters.ContainsKey(opv.Key))
+                .ToDictionary(opv => opv.Key, opv => _mapping.PropertySetters[opv.Key]);
+            // set2 contains simple properteis setters for 1:1 related resources
+            var set2 = ObjectPropertyValues
+                .Join(
+                    _mapping.Relationships.Where(r => !r.IsCollection),
+                    opv => opv.Key,
+                    r => r.RelationshipName,
+                    (opv, r) => new KeyValuePair<string, Action<object, object>>(opv.Key, (Action<object,object>)r.RelatedProperty.SetterDelegate))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            return set1.Concat(set2).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 
         private Dictionary<string, CollectionInfo<T>> ScanForCollections()
         {
-            return typeof(T)
-                .GetProperties()
-                .Where(pi => CollectionDeltas.ContainsKey(pi.Name) && 
-                (typeof(ICollection).IsAssignableFrom(pi.PropertyType)))
-                .ToDictionary(pi => pi.Name, pi => new CollectionInfo<T>
-                {
-                    Getter = pi.ToCompiledGetterFunc<T, ICollection>(),
-                    Setter = pi.ToCompiledSetterAction<T, ICollection>(),
-                    CollectionType = pi.PropertyType,
-                });
+            // 1:n related resources setters
+            var set = CollectionDeltas
+                .Join(
+                    _mapping.Relationships.Where(r => r.IsCollection),
+                    cd => cd.Key,
+                    r => r.RelationshipName,
+                    (cd, r) =>
+                        new KeyValuePair<string, CollectionInfo<T>>(
+                            cd.Key,
+                            new CollectionInfo<T>
+                            {
+                                Getter = (Func<T, ICollection>)(r.RelatedProperty.GetterDelegate),
+                                Setter = (Action<T, ICollection>)(r.RelatedProperty.SetterDelegate),
+                                CollectionType = r.RelatedProperty.Type
+                            }))
+                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            return set;
         }
 
         private class CollectionInfo<TOwner>
