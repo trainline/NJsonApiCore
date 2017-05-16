@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 using Moq;
+using System.Collections;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace NJsonApi.Test.Infrastructure
 {
@@ -41,6 +44,7 @@ namespace NJsonApi.Test.Infrastructure
                     {"id", 1},
                     {"dateTimeCreated", new DateTime(2016,1,1)}
                 };
+
             classUnderTest.Scan();
             classUnderTest.FilterOut(t => t.Name);
 
@@ -51,6 +55,204 @@ namespace NJsonApi.Test.Infrastructure
             Assert.Equal(author.Id, 1);
             Assert.Equal(author.DateTimeCreated, new DateTime(2016, 1, 1));
             Assert.Null(author.Name);
+        }
+
+        [Fact]
+        public void GIVEN_SimpleProperty_WHEN_DeltaApply_THEN_ValuesApplied()
+        {
+            //Arrange
+            Setup();
+
+            _mapping.Object.PropertySetters.Add("tittle", (o, p) => { ((Article)o).Tittle = (string)p; });
+
+            var article = new Article();
+            var classUnderTest = new Delta<Article>(_configuration.Object);
+
+            classUnderTest.ObjectPropertyValues =
+                new Dictionary<string, object>()
+                {
+                    {"tittle", "tittle value"}
+                };
+
+            classUnderTest.Scan();
+
+            //Act
+            classUnderTest.ApplySimpleProperties(article);
+
+            //Assert
+            Assert.Equal(article.Tittle, "tittle value");
+        }
+
+        [Fact]
+        public void GIVEN_RelatedResource_WHEN_DeltaApply_THEN_ValuesApplied()
+        {
+            //Arrange
+            Setup();
+
+            var articleAuthorRelatedProperty = new Mock<IPropertyHandle>(MockBehavior.Strict);
+            Action<object, object> actionSetter = (o, p) => { ((Article)o).Author = (Author)p; };
+            articleAuthorRelatedProperty.SetupGet(o => o.SetterDelegate).Returns((Delegate)actionSetter);
+
+            var articleAuthorRelationship = new Mock<IRelationshipMapping>(MockBehavior.Strict);
+            articleAuthorRelationship.SetupGet(o => o.IsCollection).Returns(false);
+            articleAuthorRelationship.SetupGet(o => o.RelationshipName).Returns("author");
+            articleAuthorRelationship.SetupGet(o => o.RelatedProperty).Returns(articleAuthorRelatedProperty.Object);
+
+            _mapping.Object.Relationships.Add(articleAuthorRelationship.Object);
+
+            var article = new Article();
+            var classUnderTest = new Delta<Article>(_configuration.Object);
+
+            classUnderTest.ObjectPropertyValues =
+                new Dictionary<string, object>()
+                {
+                    {"author", new Author {Id = 1 } }
+                };
+
+            classUnderTest.Scan();
+
+            //Act
+            classUnderTest.ApplySimpleProperties(article);
+
+            //Assert
+            Assert.NotNull(article.Author);
+            Assert.Equal(article.Author.Id, 1);
+        }
+
+        [Fact]
+        public void GIVEN_RelatedResourceCollection_WHEN_DeltaApply_THEN_ValuesApplied()
+        {
+            //Arrange
+            Setup();
+
+            var articleAuthorRelatedProperty = new Mock<IPropertyHandle>(MockBehavior.Strict);
+            Action<Article, ICollection> actionSetter = (o, p) => { ((Article)o).Comments = (IList<Comment>)p; };
+            Func<Article, ICollection> actionGetter = (o) => null;
+            articleAuthorRelatedProperty.SetupGet(o => o.SetterDelegate).Returns((Delegate)actionSetter);
+            articleAuthorRelatedProperty.SetupGet(o => o.GetterDelegate).Returns((Delegate)actionGetter);
+            articleAuthorRelatedProperty.SetupGet(o => o.Type).Returns(typeof(List<Comment>));
+
+            var articleAuthorRelationship = new Mock<IRelationshipMapping>(MockBehavior.Strict);
+            articleAuthorRelationship.SetupGet(o => o.IsCollection).Returns(true);
+            articleAuthorRelationship.SetupGet(o => o.RelationshipName).Returns("comments");
+            articleAuthorRelationship.SetupGet(o => o.RelatedProperty).Returns(articleAuthorRelatedProperty.Object);
+
+            _mapping.Object.Relationships.Add(articleAuthorRelationship.Object);
+
+            var article = new Article();
+            var classUnderTest = new Delta<Article>(_configuration.Object);
+
+            classUnderTest.CollectionDeltas =
+                new Dictionary<string, ICollectionDelta>()
+                {
+                    {"comments", new CollectionDelta<Comment>(c => c.Id)
+                        {
+                            Elements = new List<Comment> {
+                                new Comment { Id = 1 },
+                                new Comment { Id = 2 }
+                            }
+                        }
+                    }
+                };
+
+            classUnderTest.Scan();
+
+            //Act
+            classUnderTest.ApplyCollections(article);
+
+            //Assert
+            Assert.NotNull(article.Comments);
+            Assert.Equal(2, article.Comments.Count);
+            Assert.Equal(1, article.Comments[0].Id);
+            Assert.Equal(2, article.Comments[1].Id);
+        }
+
+        [Fact]
+        public void GIVEN_ComplexObjectProperty_WHEN_DeltaApply_THEN_ValuesApplied()
+        {
+            //Arrange
+            Setup();
+
+            _mapping.Object.PropertySetters.Add("author", (o, p) => { ((Article)o).Author = ((JObject)p).ToObject<Author>(); });
+
+            var article = new Article();
+            var classUnderTest = new Delta<Article>(_configuration.Object);
+
+            var authorJObject = JsonConvert.DeserializeObject("{ 'name': 'author name' }");
+            classUnderTest.ObjectPropertyValues =
+                new Dictionary<string, object>()
+                {
+                    {"author",  authorJObject}
+                };
+
+            classUnderTest.Scan();
+
+            //Act
+            classUnderTest.ApplySimpleProperties(article);
+
+            //Assert
+            Assert.NotNull(article.Author);
+            Assert.Equal("author name", article.Author.Name);
+        }
+
+        [Fact]
+        public void GIVEN_ComplexObjectCollection_WHEN_DeltaApply_THEN_ValuesApplied()
+        {
+            //Arrange
+            Setup();
+
+            _mapping.Object.PropertySetters.Add("comments", (o, p) => { ((Article)o).Comments = ((JArray)p).ToObject<List<Comment>>(); });
+
+            var article = new Article();
+            var classUnderTest = new Delta<Article>(_configuration.Object);
+
+            var commentsJArray = JsonConvert.DeserializeObject("[ { 'body': 'comment 1 body' }, { 'body': 'comment 2 body' } ]");
+            classUnderTest.ObjectPropertyValues =
+                new Dictionary<string, object>()
+                {
+                    {"comments",  commentsJArray}
+                };
+
+            classUnderTest.Scan();
+
+            //Act
+            classUnderTest.ApplySimpleProperties(article);
+
+            //Assert
+            Assert.NotNull(article.Comments);
+            Assert.Equal(2, article.Comments.Count);
+            Assert.Equal("comment 1 body", article.Comments[0].Body);
+            Assert.Equal("comment 2 body", article.Comments[1].Body);
+        }
+
+        [Fact]
+        public void GIVEN_SimpleTypeCollection_WHEN_DeltaApply_THEN_ValuesApplied()
+        {
+            //Arrange
+            Setup();
+
+            _mapping.Object.PropertySetters.Add("yearsPublished", (o, p) => { ((Article)o).YearsPublished = ((JArray)p).ToObject<List<int>>(); });
+
+            var article = new Article();
+            var classUnderTest = new Delta<Article>(_configuration.Object);
+
+            var commentsJArray = JsonConvert.DeserializeObject("[ 1234, 5678 ]");
+            classUnderTest.ObjectPropertyValues =
+                new Dictionary<string, object>()
+                {
+                    {"yearsPublished",  commentsJArray}
+                };
+
+            classUnderTest.Scan();
+
+            //Act
+            classUnderTest.ApplySimpleProperties(article);
+
+            //Assert
+            Assert.NotNull(article.YearsPublished);
+            Assert.Equal(2, article.YearsPublished.Count);
+            Assert.Equal(1234, article.YearsPublished[0]);
+            Assert.Equal(5678, article.YearsPublished[1]);
         }
 
         [Fact]
