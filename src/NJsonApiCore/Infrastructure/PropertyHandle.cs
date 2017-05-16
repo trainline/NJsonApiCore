@@ -26,23 +26,4 @@ namespace NJsonApi.Infrastructure
         public Delegate GetterDelegate { get { return Getter; } }
         public Delegate SetterDelegate { get { return Setter; } }
     }
-
-    public class PropertyHandle : IPropertyHandle
-    {
-        public PropertyHandle(Type type, LambdaExpression expression)
-        {
-            Type = type;
-            var pi = expression.GetPropertyInfo();
-            GetterDelegate = pi.ToCompiledGetterDelegate(pi.DeclaringType, pi.PropertyType);
-            SetterDelegate = pi.ToCompiledSetterDelegate(pi.DeclaringType, pi.PropertyType);
-        }
-
-        public Type Type { get; private set; }
-
-        public Delegate GetterDelegate { get; private set; }
-
-        public string Name { get; private set; }
-
-        public Delegate SetterDelegate { get; private set; }
-    }
 }

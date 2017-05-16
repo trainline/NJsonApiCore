@@ -8,8 +8,8 @@ namespace NJsonApi.Test.TestModel
     {
         public int Id { get; set; }
         public string Tittle { get; set; }
-        public List<int> YearsPublished = new List<int>();
-        public Author Author = new Author();
-        public IList<Comment> Comments = new List<Comment>();
+        public List<int> YearsPublished { get; set; } = new List<int>();
+        public Author Author { get; set; } = new Author();
+        public IList<Comment> Comments { get; set; } = new List<Comment>();
     }
 }
