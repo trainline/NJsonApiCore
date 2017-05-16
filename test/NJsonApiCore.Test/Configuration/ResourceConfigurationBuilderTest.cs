@@ -133,7 +133,7 @@ namespace NJsonApi.Test.Configuration
                 .WithSimpleProperty(a => a.Name)
                 .WithIdSelector(a => a.Id);
 
-            var resultForName = resourceConfigurationForAuthor.BuiltResourceMapping.PropertyGetters["Name"].Invoke(author);
+            var resultForName = resourceConfigurationForAuthor.BuiltResourceMapping.PropertyGetters["name"].Invoke(author);
             var resultForId = resourceConfigurationForAuthor.BuiltResourceMapping.IdGetter.Invoke(author);
 
             //Assert
@@ -170,18 +170,18 @@ namespace NJsonApi.Test.Configuration
             AssertResourceConfigurationHasValuesForWithSimpleProperty(resourceConfigurationForAuthor);
 
             Assert.Contains("author", result.ResourceType);
-            Assert.Equal(result.PropertyGetters["Name"].Invoke(author), authorName);
+            Assert.Equal(result.PropertyGetters["name"].Invoke(author), authorName);
             Assert.Equal(result.IdGetter.Invoke(author), authorId);
 
             AssertResourceConfigurationHasValuesForWithSimpleProperty(resourceConfigurationForPost);
 
             result = resourceConfigurationForPost.BuiltResourceMapping;
             Assert.Contains("post", result.ResourceType);
-            Assert.Equal(result.PropertyGetters["Title"].Invoke(post), postTitle);
+            Assert.Equal(result.PropertyGetters["title"].Invoke(post), postTitle);
 
-            resourceConfigurationForPost.BuiltResourceMapping.PropertySetters["Title"].Invoke(post, postTitleModifed);
+            resourceConfigurationForPost.BuiltResourceMapping.PropertySetters["title"].Invoke(post, postTitleModifed);
             Assert.Equal(post.Title, postTitleModifed);
-            Assert.Equal(result.PropertyGetters["Title"].Invoke(post), postTitleModifed);
+            Assert.Equal(result.PropertyGetters["title"].Invoke(post), postTitleModifed);
         }
 
         [Fact]
