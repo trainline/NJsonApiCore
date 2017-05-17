@@ -132,7 +132,7 @@ namespace NJsonApi.Infrastructure
             var set1 = ObjectPropertyValues
                 .Where(opv => _mapping.PropertySetters.ContainsKey(opv.Key))
                 .ToDictionary(opv => opv.Key, opv => _mapping.PropertySetters[opv.Key]);
-            // set2 contains simple properteis setters for 1:1 related resources
+            // set2 contains simple property setters for 1:1 related resources
             var set2 = ObjectPropertyValues
                 .Join(
                     _mapping.Relationships.Where(r => !r.IsCollection),

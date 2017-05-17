@@ -113,21 +113,21 @@ namespace NJsonApi.Utils
             {
                 if (pi.PropertyType.GetInterfaces().Any(x => x == typeof(IEnumerable)))
                 {
-                    var canConvertToJArray = Expression.Equal(Expression.TypeAs(valueParameter, typeof(JArray)),
+                    var canConvertToJArray = Expression.NotEqual(Expression.TypeAs(valueParameter, typeof(JArray)),
                         Expression.Constant(null));
 
                     exp = Expression.IfThenElse(canConvertToJArray,
-                        CreateSimpleTypeSetterExpression(pi, instanceParameter, valueParameter),
-                        CreateJArrayTypeSetterExpression(pi, instanceParameter, valueParameter));
+                        CreateJArrayTypeSetterExpression(pi, instanceParameter, valueParameter),
+                        CreateSimpleTypeSetterExpression(pi, instanceParameter, valueParameter));
                 }
                 else
                 {
-                    var canConvertToJObject = Expression.Equal(Expression.TypeAs(valueParameter, typeof(JObject)),
+                    var canConvertToJObject = Expression.NotEqual(Expression.TypeAs(valueParameter, typeof(JObject)),
                         Expression.Constant(null));
 
                     exp = Expression.IfThenElse(canConvertToJObject,
-                        CreateSimpleTypeSetterExpression(pi, instanceParameter, valueParameter),
-                        CreateJObjectTypeSetterExpression(pi, instanceParameter, valueParameter));
+                        CreateJObjectTypeSetterExpression(pi, instanceParameter, valueParameter),
+                        CreateSimpleTypeSetterExpression(pi, instanceParameter, valueParameter));
                 }
             }
             else

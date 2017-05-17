@@ -140,7 +140,7 @@ namespace NJsonApi.Test.Infrastructure
             //Arrange
             Setup();
 
-            _mapping.Object.PropertySetters.Add("tittle", (o, p) => { ((Article)o).Tittle = (string)p; });
+            _mapping.Object.PropertySetters.Add("title", (o, p) => { ((Article)o).Title = (string)p; });
 
             var article = new Article();
             var classUnderTest = new Delta<Article>(_configuration.Object);
@@ -148,7 +148,7 @@ namespace NJsonApi.Test.Infrastructure
             classUnderTest.ObjectPropertyValues =
                 new Dictionary<string, object>()
                 {
-                    {"tittle", "tittle value"}
+                    {"title", "title value"}
                 };
 
             classUnderTest.Scan();
@@ -157,7 +157,7 @@ namespace NJsonApi.Test.Infrastructure
             classUnderTest.ApplySimpleProperties(article);
 
             //Assert
-            Assert.Equal(article.Tittle, "tittle value");
+            Assert.Equal(article.Title, "title value");
         }
 
         [Fact]
