@@ -53,24 +53,25 @@ namespace NJsonApi.Infrastructure
             ThrowExceptionIfNotScanned();
             foreach (var f in filter)
             {
-                var propertyName = f.GetPropertyInfo().Name;
+                var propertyName = CamelCaseUtil.ToCamelCase(f.GetPropertyInfo().Name);
                 if (_currentTypeSetters.ContainsKey(propertyName))
-                _currentTypeSetters.Remove(propertyName);
-                _currentCollectionInfos.Remove(propertyName);
+                    _currentTypeSetters.Remove(propertyName);
+                if (_currentCollectionInfos.ContainsKey(propertyName))
+                    _currentCollectionInfos.Remove(propertyName);
             }
         }
 
         public void SetValue<TProperty>(Expression<Func<T, TProperty>> property, object value)
         {
             var propertyInfo = property.GetPropertyInfo();
-            ObjectPropertyValues[propertyInfo.Name] = value;
+            ObjectPropertyValues[CamelCaseUtil.ToCamelCase(propertyInfo.Name)] = value;
         }
 
         public TProperty GetValue<TProperty>(Expression<Func<T, TProperty>> property)
         {
             var propertyInfo = property.GetPropertyInfo();
             object val;
-            ObjectPropertyValues.TryGetValue(propertyInfo.Name, out val);
+            ObjectPropertyValues.TryGetValue(CamelCaseUtil.ToCamelCase(propertyInfo.Name), out val);
             return (TProperty)val;
         }
 

@@ -28,12 +28,57 @@ namespace NJsonApi.Test.Infrastructure
         }
 
         [Fact]
+        public void GIVEN_DeltaObject_WHEN_SetValue_THEN_ObjectPropertyValuesIsUpdated()
+        {
+            //Arrange
+            Setup();
+
+            var author = new Author();
+            var classUnderTest = new Delta<Author>(_configuration.Object);
+
+            classUnderTest.ObjectPropertyValues =
+                new Dictionary<string, object>()
+                {
+                };
+
+            //Act
+            classUnderTest.SetValue(o => o.Name, "author name");
+
+            //Assert
+            Assert.Equal("author name", classUnderTest.ObjectPropertyValues["name"]);
+        }
+
+        [Fact]
+        public void GIVEN_DeltaObject_WHEN_GetValue_THEN_ObjectPropertyValuesIsRead()
+        {
+            //Arrange
+            Setup();
+
+            var author = new Author();
+            var classUnderTest = new Delta<Author>(_configuration.Object);
+
+            classUnderTest.ObjectPropertyValues =
+                new Dictionary<string, object>()
+                {
+                    { "name", "author name" }
+                };
+
+            //Act
+            var result = classUnderTest.GetValue(o => o.Name);
+
+            //Assert
+            Assert.Equal("author name", result);
+        }
+
+        [Fact]
         public void GIVEN_IncompleteProperties_WHEN_DeltaApply_THEN_OnlyThoseSpecifiedApplied()
         {
             //Arrange
             Setup();
             _mapping.Object.PropertySetters.Add("id", (o, p) => { ((Author)o).Id = (int)p; });
+            _mapping.Object.PropertySetters.Add("name", (o, p) => { ((Author)o).Name = (string)p; });
             _mapping.Object.PropertySetters.Add("dateTimeCreated", (o, p) => { ((Author)o).DateTimeCreated = (DateTime)p; });
+
 
             var author = new Author();
             var classUnderTest = new Delta<Author>(_configuration.Object);
@@ -42,7 +87,39 @@ namespace NJsonApi.Test.Infrastructure
                 new Dictionary<string, object>()
                 {
                     {"id", 1},
-                    {"dateTimeCreated", new DateTime(2016,1,1)}
+                    {"dateTimeCreated", new DateTime(2016,1,1)},
+                };
+
+            classUnderTest.Scan();
+
+            //Act
+            classUnderTest.ApplySimpleProperties(author);
+
+            //Assert
+            Assert.Equal(author.Id, 1);
+            Assert.Equal(author.DateTimeCreated, new DateTime(2016, 1, 1));
+            Assert.Null(author.Name);
+        }
+
+        [Fact]
+        public void GIVEN_PropertiesAndFilteredOutSetters_WHEN_DeltaApply_THEN_OnlyThoseSpecifiedApplied()
+        {
+            //Arrange
+            Setup();
+            _mapping.Object.PropertySetters.Add("id", (o, p) => { ((Author)o).Id = (int)p; });
+            _mapping.Object.PropertySetters.Add("name", (o, p) => { ((Author)o).Name = (string)p; });
+            _mapping.Object.PropertySetters.Add("dateTimeCreated", (o, p) => { ((Author)o).DateTimeCreated = (DateTime)p; });
+
+
+            var author = new Author();
+            var classUnderTest = new Delta<Author>(_configuration.Object);
+
+            classUnderTest.ObjectPropertyValues =
+                new Dictionary<string, object>()
+                {
+                    {"id", 1},
+                    {"dateTimeCreated", new DateTime(2016,1,1)},
+                    {"name", "author name to be filtered out" }
                 };
 
             classUnderTest.Scan();
