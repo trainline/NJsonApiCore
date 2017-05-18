@@ -34,7 +34,6 @@ namespace NJsonApiCore.Web.MVC5
         }
 
         public override bool CanWriteType(Type type)
-
         {
             if (type == typeof(CompoundDocument))
             {

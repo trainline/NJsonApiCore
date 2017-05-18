@@ -79,7 +79,7 @@ namespace NJsonApi.Serialization
             var mapping = configuration.GetMapping(type);
             var openGeneric = typeof(Delta<>);
             var closedGenericType = openGeneric.MakeGenericType(type);
-            var delta = Activator.CreateInstance(closedGenericType) as IDelta;
+            var delta = Activator.CreateInstance(closedGenericType, this.configuration) as IDelta;
 
             if (delta == null)
             {
@@ -110,7 +110,7 @@ namespace NJsonApi.Serialization
                         collection.Elements = Activator.CreateInstance(closedGenericTypeList) as IList;
                         foreach (var id in multipleIDs)
                         {
-                            var colProp = relMapping.RelatedCollectionProperty;
+                            var colProp = relMapping.RelatedProperty;
 
                             var newInstance = Activator.CreateInstance(relMapping.RelatedBaseType);
                             relatedTypeMapping.IdSetter(newInstance, id.Id);

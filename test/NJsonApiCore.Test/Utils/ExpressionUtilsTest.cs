@@ -92,7 +92,7 @@ namespace NJsonApi.Common.Test.Utils
         }
 
         [Fact]
-        public void ToCompiledSetterAction_GivenListType_ReturnsWorkingDelegate()
+        public void ToCompiledSetterAction_GivenListType_ReturnsWorkingDelegateForJArray()
         {
             // Arrange
             var complex = new ListClass();
@@ -103,6 +103,24 @@ namespace NJsonApi.Common.Test.Utils
 
             // Act
             action(complex, obj);
+
+            // Assert
+            Assert.NotNull(complex.ListType);
+            Assert.Equal(complex.ListType.Count, 1);
+            Assert.Equal("bar", complex.ListType[0].Foo.Bar);
+        }
+
+        [Fact]
+        public void ToCompiledSetterAction_GivenListType_ReturnsWorkingDelegateForList()
+        {
+            // Arrange
+            var complex = new ListClass();
+            var listType = new List<ComplexClass>() { new ComplexClass() { Foo = new Foo() { Bar = "bar" } } };
+
+            var action = typeof(ListClass).GetProperty(nameof(complex.ListType)).ToCompiledSetterAction<ListClass, List<ComplexClass>>();
+
+            // Act
+            action(complex, listType);
 
             // Assert
             Assert.NotNull(complex.ListType);

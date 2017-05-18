@@ -5,6 +5,7 @@ namespace NJsonApi.Infrastructure
 {
     public interface IPropertyHandle
     {
+        Type Type { get; }
         Delegate GetterDelegate { get; }
         Delegate SetterDelegate { get; }
         string Name { get; }
@@ -14,6 +15,6 @@ namespace NJsonApi.Infrastructure
     {
         Expression<Func<TResource, TProperty>> Expression { get; }
         Func<TResource, TProperty> Getter { get; }
-        Action<TResource, object> Setter { get; }
+        Action<object, object> Setter { get; }
     }
 }
