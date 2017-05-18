@@ -157,8 +157,8 @@ namespace NJsonApi.Test.Configuration
             Assert.Equal(postMapping.IdGetter(post), 4);
             Assert.Equal(postMapping.PropertyGetters.Count, 2);
             Assert.Equal(postMapping.PropertySetters.Count, 2);
-            Assert.Equal(postMapping.PropertyGetters["Title"](post), testTitle);
-            Assert.True(postMapping.PropertyGetters.ContainsKey("AuthorId"));
+            Assert.Equal(postMapping.PropertyGetters["title"](post), testTitle);
+            Assert.True(postMapping.PropertyGetters.ContainsKey("authorId"));
         }
 
         [Fact]

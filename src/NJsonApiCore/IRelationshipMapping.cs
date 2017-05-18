@@ -14,7 +14,7 @@ namespace NJsonApi
         ResourceInclusionRules InclusionRule { get; set; }
 
         IResourceMapping ResourceMapping { get; set; }
-        IPropertyHandle RelatedCollectionProperty { get; set; }
+        IPropertyHandle RelatedProperty { get; set; }
         Func<object, object> RelatedResource { get; }
         Func<object, object> RelatedResourceId { get; }
         string ParentResourceNavigationPropertyName { get; }

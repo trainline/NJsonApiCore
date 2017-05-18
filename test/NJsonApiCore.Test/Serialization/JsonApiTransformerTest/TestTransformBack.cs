@@ -41,7 +41,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
             var resultDelta = transformer.TransformBack(updateDocument, typeof(Post), context);
 
             // Assert
-            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("Title"));
+            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("title"));
         }
 
         [Fact]
@@ -70,8 +70,8 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
             var resultDelta = transformer.TransformBack(updateDocument, typeof(Post), context);
 
             // Assert
-            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("Title"));
-            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("AuthorId"));
+            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("title"));
+            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("authorId"));
         }
 
         [Fact]
@@ -101,9 +101,9 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
             var resultDelta = transformer.TransformBack(updateDocument, typeof(Product), context);
 
             // Assert
-            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("Name"));
-            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("Dimensions"));
-            Assert.Equal(dimensions, resultDelta.ObjectPropertyValues["Dimensions"]);
+            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("name"));
+            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("dimensions"));
+            Assert.Equal(dimensions, resultDelta.ObjectPropertyValues["dimensions"]);
         }
 
         [Fact]
@@ -138,9 +138,9 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
             var resultDelta = transformer.TransformBack(updateDocument, typeof(Widget), context);
 
             // Assert
-            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("Name"));
-            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("Parts"));
-            Assert.Equal(resultDelta.ObjectPropertyValues["Parts"], widgetParts);
+            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("name"));
+            Assert.True(resultDelta.ObjectPropertyValues.ContainsKey("parts"));
+            Assert.Equal(resultDelta.ObjectPropertyValues["parts"], widgetParts);
         }
 
         [Fact]

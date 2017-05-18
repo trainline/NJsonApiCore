@@ -16,12 +16,12 @@ namespace NJsonApi
         public string RelatedBaseResourceType { get; set; }
         public IResourceMapping ResourceMapping { get; set; }
         public bool IsCollection { get; set; }
-        public IPropertyHandle<TParent, TNested> RelatedCollectionProperty { get; set; }
+        public IPropertyHandle<TParent, TNested> RelatedProperty { get; set; }
 
-        IPropertyHandle IRelationshipMapping.RelatedCollectionProperty
+        IPropertyHandle IRelationshipMapping.RelatedProperty
         {
-            get { return RelatedCollectionProperty; }
-            set { RelatedCollectionProperty = (IPropertyHandle<TParent, TNested>)value; }
+            get { return RelatedProperty; }
+            set { RelatedProperty = (IPropertyHandle<TParent, TNested>)value; }
         }
 
         public ResourceInclusionRules InclusionRule { get; set; }

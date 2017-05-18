@@ -167,7 +167,7 @@ namespace NJsonApi
                 ResourceIdGetter = idAccessor,
                 ResourceGetter = ExpressionUtils.CompileToObjectTypedExpression(objectAccessor),
                 IsCollection = isCollection,
-                RelatedCollectionProperty = isCollection ? new PropertyHandle<TResource, TNested>(objectAccessor) : null,
+                RelatedProperty = new PropertyHandle<TResource, TNested>(objectAccessor),
                 RelatedBaseType = linkedType,
                 RelatedBaseResourceType = linkedResourceType,
                 InclusionRule = inclusionRule
@@ -179,7 +179,7 @@ namespace NJsonApi
 
         private void AddProperty(PropertyInfo propertyInfo, SerializationDirection direction = SerializationDirection.Both)
         {
-            var name = propertyInfo.Name;
+            var name = CamelCaseUtil.ToCamelCase(propertyInfo.Name);
             if (BuiltResourceMapping.PropertyGetters.ContainsKey(name) ||
                 BuiltResourceMapping.PropertySetters.ContainsKey(name))
             {
@@ -193,7 +193,10 @@ namespace NJsonApi
 
             if (direction == SerializationDirection.In || direction == SerializationDirection.Both)
             {
-                BuiltResourceMapping.PropertySetters[name] = propertyInfo.SetValue;
+                BuiltResourceMapping.PropertySetters[name] =
+                    !PropertyScanningConvention.IsLinkedResource(propertyInfo)
+                    ? propertyInfo.SetValue
+                    : (Action<object,object>)(Delegate)(propertyInfo.ToCompiledSetterAction<object, object>());
             }
 
             var instance = Expression.Parameter(typeof(object), "i");
@@ -213,7 +216,7 @@ namespace NJsonApi
 
         private void RemoveProperty(PropertyInfo propertyInfo)
         {
-            var name = propertyInfo.Name;
+            var name = CamelCaseUtil.ToCamelCase(propertyInfo.Name);
             BuiltResourceMapping.PropertyGetters.Remove(name);
             BuiltResourceMapping.PropertySetters.Remove(name);
             BuiltResourceMapping.PropertySettersExpressions.Remove(name);

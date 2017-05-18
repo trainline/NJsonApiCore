@@ -1,5 +1,7 @@
-﻿using NJsonApi.Test.TestControllers;
+﻿using Newtonsoft.Json;
+using NJsonApi.Test.TestControllers;
 using NJsonApi.Test.TestModel;
+using System.Collections.Generic;
 using Xunit;
 
 namespace NJsonApi.Test.Configuration
@@ -8,7 +10,7 @@ namespace NJsonApi.Test.Configuration
     {
         private ConfigurationBuilder configurationBuilder;
 
-        public ResourceConfigurationBuilderTest()
+        public void Setup()
         {
             configurationBuilder = new ConfigurationBuilder();
         }
@@ -17,6 +19,8 @@ namespace NJsonApi.Test.Configuration
         public void TestWithResourceType()
         {
             //Arrange
+            Setup();
+
             string resourceType = typeof(Author).Name;
             var classUnderTest = configurationBuilder.Resource<Author, AuthorsController>();
 
@@ -31,6 +35,8 @@ namespace NJsonApi.Test.Configuration
         public void TestWithResourceTypeForMultipleTypes()
         {
             //Arrange
+            Setup();
+
             string resourceTypeAuthor = typeof(Author).Name;
             string resourceTypePost = typeof(Post).Name;
             var resourceConfigurationForAuthor = configurationBuilder.Resource<Author, AuthorsController>();
@@ -54,6 +60,8 @@ namespace NJsonApi.Test.Configuration
         public void TestWithIdSelector()
         {
             //Arrange
+            Setup();
+
             var resourceConfigurationForAuthor = configurationBuilder.Resource<Author, AuthorsController>();
             const int authorId = 5;
             var author = new Author() { Id = authorId };
@@ -70,6 +78,8 @@ namespace NJsonApi.Test.Configuration
         public void TestWithIdSelectorForMultipleTypes()
         {
             //Arrange
+            Setup();
+
             var resourceConfigurationForAuthor = configurationBuilder.Resource<Author, AuthorsController>();
             var resourceConfigurationForPost = configurationBuilder.Resource<Post, PostsController>();
             const int authorId = 5;
@@ -92,6 +102,8 @@ namespace NJsonApi.Test.Configuration
         public void TestWithSimpleProperty()
         {
             //Arrange
+            Setup();
+
             const int authorId = 5;
             var author = new Author() { Id = authorId };
             var resourceConfigurationForAuthor = configurationBuilder.Resource<Author, AuthorsController>();
@@ -110,6 +122,8 @@ namespace NJsonApi.Test.Configuration
         public void TestWithSimplePropertyWithIdentity()
         {
             //Arrange & Act
+            Setup();
+
             var resourceConfigurationForAuthor = configurationBuilder
                 .Resource<Author, AuthorsController>()
                 .WithSimpleProperty(a => a.Name)
@@ -123,6 +137,8 @@ namespace NJsonApi.Test.Configuration
         public void GIVEN_ModelWithSingleProperty_WHEN_BuildConfiguration_THEN_PropertyIsMapped()
         {
             //Arrange
+            Setup();
+
             const int authorId = 5;
             const string authorName = "Valentin";
             var author = new Author() { Id = authorId, Name = authorName };
@@ -133,7 +149,7 @@ namespace NJsonApi.Test.Configuration
                 .WithSimpleProperty(a => a.Name)
                 .WithIdSelector(a => a.Id);
 
-            var resultForName = resourceConfigurationForAuthor.BuiltResourceMapping.PropertyGetters["Name"].Invoke(author);
+            var resultForName = resourceConfigurationForAuthor.BuiltResourceMapping.PropertyGetters["name"].Invoke(author);
             var resultForId = resourceConfigurationForAuthor.BuiltResourceMapping.IdGetter.Invoke(author);
 
             //Assert
@@ -142,9 +158,276 @@ namespace NJsonApi.Test.Configuration
         }
 
         [Fact]
+        public void GIVEN_ModelWithComplexObjectProperty_WHEN_BuildConfiguration_THEN_PropertyIsMapped_Getter()
+        {
+            //Arrange
+            Setup();
+
+            const int authorId = 5;
+            const string authorName = "Valentin";
+            var article = new Article() { Id = 1 };
+            var author = new Author { Id = authorId, Name = authorName };
+            article.Author = author;
+
+            //Act
+            var resourceConfigurationForArticle = configurationBuilder
+                .Resource<Article, ArticlesController>()
+                .WithSimpleProperty(a => a.Author)
+                .WithIdSelector(a => a.Id);
+
+            var resultForAuthor = resourceConfigurationForArticle.BuiltResourceMapping.PropertyGetters["author"].Invoke(article);
+
+            //Assert
+            Assert.Equal(authorId, ((Author)resultForAuthor).Id);
+            Assert.Equal(authorName, ((Author)resultForAuthor).Name);
+        }
+
+        [Fact]
+        public void GIVEN_ModelWithComplexObjectProperty_WHEN_BuildConfiguration_THEN_PropertyIsMapped_SetterAsObject()
+        {
+            //Arrange
+            Setup();
+
+            const int authorId = 5;
+            const string authorName = "Valentin";
+            var article = new Article() { Id = 1 };
+            var author = new Author { Id = authorId, Name = authorName };
+
+            //Act
+            var resourceConfigurationForArticle = new ConfigurationBuilder()
+                .Resource<Article, ArticlesController>()
+                .WithSimpleProperty(a => a.Author)
+                .WithIdSelector(a => a.Id);
+
+            resourceConfigurationForArticle.BuiltResourceMapping.PropertySetters["author"].Invoke(article, author);
+
+            //Assert
+            Assert.Equal(authorId, article.Author.Id);
+            Assert.Equal(authorName, article.Author.Name);
+        }
+
+        [Fact]
+        public void GIVEN_ModelWithComplexObjectProperty_WHEN_BuildConfiguration_THEN_PropertyIsMapped_SetterAsJObject()
+        {
+            //Arrange
+            Setup();
+
+            const int authorId = 5;
+            const string authorName = "Valentin";
+            var article = new Article() { Id = 1 };
+            var author = new Author { Id = authorId, Name = authorName };
+
+            //Act
+            var resourceConfigurationForArticle = new ConfigurationBuilder()
+                .Resource<Article, ArticlesController>()
+                .WithSimpleProperty(a => a.Author)
+                .WithIdSelector(a => a.Id);
+
+            resourceConfigurationForArticle.BuiltResourceMapping.PropertySetters["author"].Invoke(article, JsonConvert.DeserializeObject(JsonConvert.SerializeObject(author)));
+
+            //Assert
+            Assert.Equal(authorId, article.Author.Id);
+            Assert.Equal(authorName, article.Author.Name);
+        }
+
+        [Fact]
+        public void GIVEN_ModelWithComplexObjectCollection_WHEN_BuildConfiguration_THEN_PropertyIsMapped_Getter()
+        {
+            //Arrange
+            Setup();
+
+            var article = new Article() { Id = 1 };
+            var comments = new List<Comment> { new Comment { Body = "body 1" }, new Comment { Body = "body 2" } };
+            article.Comments = comments;
+
+            //Act
+            var resourceConfigurationForArticle = configurationBuilder
+                .Resource<Article, ArticlesController>()
+                .WithSimpleProperty(a => a.Comments)
+                .WithIdSelector(a => a.Id);
+
+            var resultForComments = (List<Comment>) resourceConfigurationForArticle.BuiltResourceMapping.PropertyGetters["comments"].Invoke(article);
+
+            //Assert
+            Assert.Equal(comments.Count, resultForComments.Count);
+            Assert.Equal(comments[0].Body, resultForComments[0].Body);
+            Assert.Equal(comments[1].Body, resultForComments[1].Body);
+        }
+
+
+        [Fact]
+        public void GIVEN_ModelWithComplexObjectCollection_WHEN_BuildConfiguration_THEN_PropertyIsMapped_SetterAsList()
+        {
+            //Arrange
+            Setup();
+
+            var article = new Article() { Id = 1 };
+            var comments = new List<Comment> { new Comment { Body = "body 1" }, new Comment { Body = "body 2" } };
+            
+            //Act
+            var resourceConfigurationForArticle = configurationBuilder
+                .Resource<Article, ArticlesController>()
+                .WithSimpleProperty(a => a.Comments)
+                .WithIdSelector(a => a.Id);
+
+            resourceConfigurationForArticle.BuiltResourceMapping.PropertySetters["comments"].Invoke(article, comments);
+
+            //Assert
+            Assert.Equal(comments.Count, article.Comments.Count);
+            Assert.Equal(comments[0].Body, article.Comments[0].Body);
+            Assert.Equal(comments[1].Body, article.Comments[1].Body);
+        }
+
+        [Fact]
+        public void GIVEN_ModelWithComplexObjectCollection_WHEN_BuildConfiguration_THEN_PropertyIsMapped_SetterAsJArray()
+        {
+            //Arrange
+            Setup();
+
+            var article = new Article() { Id = 1 };
+            var comments = new List<Comment> { new Comment { Body = "body 1" }, new Comment { Body = "body 2" } };
+
+            //Act
+            var resourceConfigurationForArticle = configurationBuilder
+                .Resource<Article, ArticlesController>()
+                .WithSimpleProperty(a => a.Comments)
+                .WithIdSelector(a => a.Id);
+
+            resourceConfigurationForArticle.BuiltResourceMapping.PropertySetters["comments"].Invoke(article, JsonConvert.DeserializeObject(JsonConvert.SerializeObject(comments)));
+
+            //Assert
+            Assert.Equal(comments.Count, article.Comments.Count);
+            Assert.Equal(comments[0].Body, article.Comments[0].Body);
+            Assert.Equal(comments[1].Body, article.Comments[1].Body);
+        }
+
+        [Fact]
+        public void GIVEN_ModelWithRelatedResourceProperty_WHEN_BuildConfiguration_THEN_PropertyIsMapped_Getter()
+        {
+            //Arrange
+            Setup();
+
+            const int authorId = 5;
+            const string authorName = "Valentin";
+            var article = new Article() { Id = 1 };
+            var author = new Author { Id = authorId, Name = authorName };
+            article.Author = author;
+
+            //Act
+            var resourceConfigurationForArticle = configurationBuilder
+                .Resource<Article, ArticlesController>()
+                .WithLinkedResource<Author>(a => a.Author)
+                .WithIdSelector(a => a.Id);
+
+            var resultForAuthor = (Author)resourceConfigurationForArticle
+                .BuiltResourceMapping
+                .Relationships
+                .Find(r => r.RelationshipName == "author")
+                .RelatedProperty
+                .GetterDelegate
+                .DynamicInvoke(article);
+
+            //Assert
+            Assert.Equal(authorId, ((Author)resultForAuthor).Id);
+            Assert.Equal(authorName, ((Author)resultForAuthor).Name);
+        }
+
+        [Fact]
+        public void GIVEN_ModelWithRelatedResourceProperty_WHEN_BuildConfiguration_THEN_PropertyIsMapped_Setter()
+        {
+            //Arrange
+            Setup();
+
+            const int authorId = 5;
+            const string authorName = "Valentin";
+            var article = new Article() { Id = 1 };
+            var author = new Author { Id = authorId, Name = authorName };
+
+            //Act
+            var resourceConfigurationForArticle = new ConfigurationBuilder()
+                .Resource<Article, ArticlesController>()
+                .WithLinkedResource<Author>(a => a.Author)
+                .WithIdSelector(a => a.Id);
+
+            resourceConfigurationForArticle
+                .BuiltResourceMapping
+                .Relationships
+                .Find(r => r.RelationshipName == "author")
+                .RelatedProperty
+                .SetterDelegate
+                .DynamicInvoke(article, author);
+
+            //Assert
+            Assert.Equal(authorId, article.Author.Id);
+            Assert.Equal(authorName, article.Author.Name);
+        }
+
+        [Fact]
+        public void GIVEN_ModelWithRelatedResourceCollection_WHEN_BuildConfiguration_THEN_PropertyIsMapped_Getter()
+        {
+            //Arrange
+            Setup();
+
+            var article = new Article() { Id = 1 };
+            var comments = new List<Comment> { new Comment { Body = "body 1" }, new Comment { Body = "body 2" } };
+            article.Comments = comments;
+
+            //Act
+            var resourceConfigurationForArticle = configurationBuilder
+                .Resource<Article, ArticlesController>()
+                .WithLinkedResource<IList<Comment>>(a => a.Comments)
+                .WithIdSelector(a => a.Id);
+
+            var resultForComments = (List<Comment>)resourceConfigurationForArticle
+                .BuiltResourceMapping
+                .Relationships
+                .Find(r => r.RelationshipName == "comments")
+                .RelatedProperty
+                .GetterDelegate
+                .DynamicInvoke(article);
+
+            //Assert
+            Assert.Equal(comments.Count, resultForComments.Count);
+            Assert.Equal(comments[0].Body, resultForComments[0].Body);
+            Assert.Equal(comments[1].Body, resultForComments[1].Body);
+        }
+
+
+        [Fact]
+        public void GIVEN_ModelWithRelatedResourceCollection_WHEN_BuildConfiguration_THEN_PropertyIsMapped_Setter()
+        {
+            //Arrange
+            Setup();
+
+            var article = new Article() { Id = 1 };
+            var comments = new List<Comment> { new Comment { Body = "body 1" }, new Comment { Body = "body 2" } };
+
+            //Act
+            var resourceConfigurationForArticle = configurationBuilder
+                .Resource<Article, ArticlesController>()
+                .WithLinkedResource<IList<Comment>>(a => a.Comments)
+                .WithIdSelector(a => a.Id);
+
+            resourceConfigurationForArticle
+                .BuiltResourceMapping
+                .Relationships
+                .Find(r => r.RelationshipName == "comments")
+                .RelatedProperty
+                .SetterDelegate
+                .DynamicInvoke(article, comments);
+
+            //Assert
+            Assert.Equal(comments.Count, article.Comments.Count);
+            Assert.Equal(comments[0].Body, article.Comments[0].Body);
+            Assert.Equal(comments[1].Body, article.Comments[1].Body);
+        }
+
+        [Fact]
         public void GIVEN_MultipleTypes_WHEN_BuildConfiguration_THEN_TypesAreStoredInConfiguration()
         {
             //Arrange
+            Setup();
+
             var authorId = 5;
             var authorName = "Valentin";
             var postId = 6;
@@ -170,24 +453,26 @@ namespace NJsonApi.Test.Configuration
             AssertResourceConfigurationHasValuesForWithSimpleProperty(resourceConfigurationForAuthor);
 
             Assert.Contains("author", result.ResourceType);
-            Assert.Equal(result.PropertyGetters["Name"].Invoke(author), authorName);
+            Assert.Equal(result.PropertyGetters["name"].Invoke(author), authorName);
             Assert.Equal(result.IdGetter.Invoke(author), authorId);
 
             AssertResourceConfigurationHasValuesForWithSimpleProperty(resourceConfigurationForPost);
 
             result = resourceConfigurationForPost.BuiltResourceMapping;
             Assert.Contains("post", result.ResourceType);
-            Assert.Equal(result.PropertyGetters["Title"].Invoke(post), postTitle);
+            Assert.Equal(result.PropertyGetters["title"].Invoke(post), postTitle);
 
-            resourceConfigurationForPost.BuiltResourceMapping.PropertySetters["Title"].Invoke(post, postTitleModifed);
+            resourceConfigurationForPost.BuiltResourceMapping.PropertySetters["title"].Invoke(post, postTitleModifed);
             Assert.Equal(post.Title, postTitleModifed);
-            Assert.Equal(result.PropertyGetters["Title"].Invoke(post), postTitleModifed);
+            Assert.Equal(result.PropertyGetters["title"].Invoke(post), postTitleModifed);
         }
 
         [Fact]
         public void IgnorePropertyTest()
         {
             //Arrange
+            Setup();
+
             const int authorId = 5;
             var author = new Author() { Id = authorId };
             var resourceConfigurationForAuthor = configurationBuilder.Resource<Author, AuthorsController>();
@@ -215,6 +500,7 @@ namespace NJsonApi.Test.Configuration
         public void WithLinkedResourceTest()
         {
             //Arrange
+            Setup();
 
             //Act
             var resourceConfigurationForPost = configurationBuilder

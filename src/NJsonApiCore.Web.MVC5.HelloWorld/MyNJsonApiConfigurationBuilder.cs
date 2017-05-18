@@ -17,8 +17,16 @@ namespace NJsonApiCore.Web.MVC5.HelloWorld
             var configBuilder = new ConfigurationBuilder();
 
             configBuilder
+                // see the Article class for clarification what each of the properties or relations illustrates
                 .Resource<Article, ArticlesController>()
-                .WithAllProperties();
+                .WithAllSimpleProperties()
+                .WithSimpleProperty(o => o.SingleTag)
+                .WithSimpleProperty(o => o.MoreTags)
+                .WithSimpleProperty(o => o.PublishedInYears)
+                .WithLinkedResource(o => o.Author)
+                .WithLinkedResource(o => o.Reviewer)
+                .WithLinkedResource(o => o.Comments)
+                .WithLinkedResource(o => o.MoreComments);
 
             configBuilder
                 .Resource<Person, PeopleController>()

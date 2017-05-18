@@ -40,20 +40,6 @@ namespace NJsonApi
             Relationships = new List<IRelationshipMapping>();
         }
 
-        public void AddPropertyGetter(string key, Expression<Func<TEntity, object>> expression)
-        {
-            PropertyGetters.Add(key, ExpressionUtils.CompileToObjectTypedFunction(expression));
-        }
-
-        public void AddPropertySetter(string key, Expression<Action<TEntity, object>> expression)
-        {
-            var convertedExpression = ExpressionUtils.ConvertToObjectTypeExpression(expression);
-
-            PropertySettersExpressions.Add(key, convertedExpression);
-            PropertySetters.Add(key, convertedExpression.Compile());
-        }
-
-
         public bool ValidateIncludedRelationshipPaths(string[] includedPaths)
         {
             foreach (var relationshipPath in includedPaths)
@@ -98,7 +84,7 @@ namespace NJsonApi
                 attributes.TryGetValue(CamelCaseUtil.ToCamelCase(propertySetter.Key), out value);
                 if (value != null)
                 {
-                    values.Add(propertySetter.Key, value);
+                    values.Add(CamelCaseUtil.ToCamelCase(propertySetter.Key), value);
                 }
             }
 
