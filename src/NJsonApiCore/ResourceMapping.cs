@@ -91,10 +91,16 @@ namespace NJsonApi
             return values;
         }
 
-        public MetaData GetMetadata(object objectGraph)
+        public MetaData GetObjectMetadata(object objectGraph)
         {
-            var metadata = (objectGraph as IMetaDataContainer);
+            var metadata = (objectGraph as IObjectMetaDataContainer);
             return metadata?.GetMetaData().Count > 0 ? metadata.GetMetaData() : null; 
+        }
+
+        public MetaData GetRelationshipMetadata(object objectGraph)
+        {
+            var metadata = (objectGraph as IRelationshipMetaDataContainer);
+            return metadata?.GetMetaData().Count > 0 ? metadata.GetMetaData() : null;
         }
     }
 }

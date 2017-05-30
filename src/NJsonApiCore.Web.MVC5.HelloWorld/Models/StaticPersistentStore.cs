@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NJsonApi.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -29,10 +30,12 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Models
             var article2 = new Article("JSON API makes the tea!");
 
             var person1 = new Person("Dan", "Gebhardt", "dgeb");
-            person1.GetMetaData().Add("person created", DateTime.Now);
+            ((IObjectMetaDataContainer)person1).GetMetaData().Add("person created", DateTime.Now);
+            ((IRelationshipMetaDataContainer)person1).GetMetaData().Add("relation for person created", DateTime.Now);
             var person2 = new Person("Rob", "Lang", "brainwipe");
 
             var comment1 = new Comment("First!");
+            (comment1 as IRelationshipMetaDataContainer).GetMetaData().Add("relation for comment created", DateTime.Now);
             var comment2 = new Comment("I like XML Better");
             var comment3 = new Comment("First! More");
             var comment4 = new Comment("I like XML Better More");

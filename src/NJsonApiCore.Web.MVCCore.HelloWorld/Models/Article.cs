@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NJsonApi.Web.MVCCore.HelloWorld.Models
 {
-    public class Article : MetaDataContainer
+    public class Article : ObjectMetaDataContainer
     {
         public Article()
         {

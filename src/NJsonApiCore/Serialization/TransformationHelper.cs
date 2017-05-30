@@ -40,7 +40,8 @@ namespace NJsonApi.Serialization
                 var id = new SingleResourceIdentifier
                 {
                     Id = resourceMapping.IdGetter(x).ToString(),
-                    Type = resourceMapping.ResourceType
+                    Type = resourceMapping.ResourceType,
+                    MetaData = resourceMapping.GetRelationshipMetadata(x)
                 };
 
                 return id;
@@ -94,7 +95,8 @@ namespace NJsonApi.Serialization
                     var relatedResourceId = new SingleResourceIdentifier
                     {
                         Id = relationship.ResourceMapping.IdGetter(relatedResource).ToString(),
-                        Type = relationship.ResourceMapping.ResourceType
+                        Type = relationship.ResourceMapping.ResourceType,
+                        MetaData = relationship.ResourceMapping.GetRelationshipMetadata(relatedResource)
                     };
 
                     if (alreadyVisitedObjects.Contains(relatedResourceId))
@@ -165,9 +167,9 @@ namespace NJsonApi.Serialization
 
         public IMetaData GetMetadata(object objectGraph)
         {
-            if (objectGraph is IMetaDataContainer)
+            if (objectGraph is IObjectMetaDataContainer)
             {
-                var metaDataContainer = objectGraph as IMetaDataContainer;
+                var metaDataContainer = objectGraph as IObjectMetaDataContainer;
                 return metaDataContainer.GetMetaData();
             }
             return null;
@@ -184,7 +186,7 @@ namespace NJsonApi.Serialization
             result.Type = resourceMapping.ResourceType;
             result.Attributes = resourceMapping.GetAttributes(objectGraph, configuration.GetJsonSerializerSettings());            
             result.Links = new Dictionary<string, ILink>() { { "self", linkBuilder.FindResourceSelfLink(context, result.Id, resourceMapping) } };
-            result.MetaData = resourceMapping.GetMetadata(objectGraph);
+            result.MetaData = resourceMapping.GetObjectMetadata(objectGraph);
 
             if (resourceMapping.Relationships.Any())
             {
@@ -230,7 +232,8 @@ namespace NJsonApi.Serialization
                             rel.Data = new SingleResourceIdentifier
                             {
                                 Id = relatedId,
-                                Type = configuration.GetMapping(relatedInstance.GetType()).ResourceType // This allows polymorphic (subtyped) resources to be fully represented
+                                Type = configuration.GetMapping(relatedInstance.GetType()).ResourceType, // This allows polymorphic (subtyped) resources to be fully represented
+                                MetaData = configuration.GetMapping(relatedInstance.GetType()).GetRelationshipMetadata(relatedInstance)
                             };
                         else if (relatedId == null || linkMapping.InclusionRule == ResourceInclusionRules.ForceInclude)
                             rel.Data = new NullResourceIdentifier(); // two-state null case, see NullResourceIdentifier summary
@@ -253,7 +256,8 @@ namespace NJsonApi.Serialization
                             .Select(o => new SingleResourceIdentifier
                             {
                                 Id = idGetter(o).ToString(),
-                                Type = configuration.GetMapping(o.GetType()).ResourceType // This allows polymorphic (subtyped) resources to be fully represented
+                                Type = configuration.GetMapping(o.GetType()).ResourceType, // This allows polymorphic (subtyped) resources to be fully represented
+                                MetaData = configuration.GetMapping(o.GetType()).GetRelationshipMetadata(o)
                             });
                         rel.Data = new MultipleResourceIdentifiers(identifiers);
                     }

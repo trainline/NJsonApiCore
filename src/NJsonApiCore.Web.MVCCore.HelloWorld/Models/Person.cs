@@ -2,7 +2,7 @@
 
 namespace NJsonApi.Web.MVCCore.HelloWorld.Models
 {
-    public class Person : MetaDataContainer
+    public class Person : ObjectMetaDataContainer
     {
         public Person(string firstname, string lastname, string twitter)
         {

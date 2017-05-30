@@ -1,11 +1,14 @@
-﻿using System;
+﻿using NJsonApi.Infrastructure;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace NJsonApi.Web.MVC5.HelloWorld.Models
 {
-    public class Comment
+    public class Comment : IRelationshipMetaDataContainer
     {
+        private RelationshipMetaDataContainer _relationshipMetadata = new RelationshipMetaDataContainer();
+
         public Comment()
         {
             Id = StaticPersistentStore.GetNextId();
@@ -22,5 +25,10 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Models
         public string Body { get; set; }
 
         public Person Author { get; set; }
+
+        MetaData IRelationshipMetaDataContainer.GetMetaData()
+        {
+            return ((IRelationshipMetaDataContainer)_relationshipMetadata).GetMetaData();
+        }
     }
 }
