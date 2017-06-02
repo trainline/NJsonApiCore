@@ -68,6 +68,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
             var transformedObject = result.Data as SingleResource;
             Assert.Equal("value100", ((SingleResourceIdentifier)(transformedObject.Relationships["relatedObject"]).Data).MetaData["meta100"]);
             Assert.Equal("value1", ((MultipleResourceIdentifiers)(transformedObject.Relationships["relatedObjects"]).Data)[0].MetaData["meta1"]);
+            Assert.Equal("value2", ((MultipleResourceIdentifiers)(transformedObject.Relationships["relatedObjects"]).Data)[1].MetaData["meta2"]);
         }
 
         private static SampleClass CreateObjectToTransform()
@@ -111,6 +112,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
             };
             o.RelatedObject.GetMetaData().Add("meta100", "value100");
             o.RelatedObjects[0].GetMetaData().Add("meta1", "value1");
+            o.RelatedObjects[1].GetMetaData().Add("meta2", "value2");
             return o;
         }
 
