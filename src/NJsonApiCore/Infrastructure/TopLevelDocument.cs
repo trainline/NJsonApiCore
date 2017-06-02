@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace NJsonApi.Infrastructure
 {
-    public class TopLevelDocument<T> : MetaDataContainer, ITopLevelDocument
+    public class TopLevelDocument<T> : ObjectMetaDataContainer, ITopLevelDocument
     {
         private Type _valueType = typeof(T);
 
