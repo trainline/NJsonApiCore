@@ -23,8 +23,5 @@ namespace NJsonApi
         Dictionary<string, object> GetAttributes(object objectGraph, JsonSerializerSettings settings);
 
         Dictionary<string, object> GetValuesFromAttributes(Dictionary<string, object> attributes);
-
-        MetaData GetObjectMetadata(object objectGraph);
-        MetaData GetRelationshipMetadata(object objectGraph);
     }
 }

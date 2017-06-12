@@ -41,7 +41,7 @@ namespace NJsonApi.Serialization
                 {
                     Id = resourceMapping.IdGetter(x).ToString(),
                     Type = resourceMapping.ResourceType,
-                    MetaData = resourceMapping.GetRelationshipMetadata(x)
+                    MetaData = GetRelationshipMetadata(x)
                 };
 
                 return id;
@@ -96,7 +96,7 @@ namespace NJsonApi.Serialization
                     {
                         Id = relationship.ResourceMapping.IdGetter(relatedResource).ToString(),
                         Type = relationship.ResourceMapping.ResourceType,
-                        MetaData = relationship.ResourceMapping.GetRelationshipMetadata(relatedResource)
+                        MetaData = GetRelationshipMetadata(relatedResource)
                     };
 
                     if (alreadyVisitedObjects.Contains(relatedResourceId))
@@ -184,9 +184,10 @@ namespace NJsonApi.Serialization
 
             result.Id = resourceMapping.IdGetter(objectGraph).ToString();
             result.Type = resourceMapping.ResourceType;
-            result.Attributes = resourceMapping.GetAttributes(objectGraph, configuration.GetJsonSerializerSettings());            
-            result.Links = new Dictionary<string, ILink>() { { "self", linkBuilder.FindResourceSelfLink(context, result.Id, resourceMapping) } };
-            result.MetaData = resourceMapping.GetObjectMetadata(objectGraph);
+            result.Attributes = resourceMapping.GetAttributes(objectGraph, configuration.GetJsonSerializerSettings());
+            result.Links = GetObjectLinkData(objectGraph);
+            result.Links.Add("self", linkBuilder.FindResourceSelfLink(context, result.Id, resourceMapping));
+            result.MetaData = GetObjectMetadata(objectGraph);
 
             if (resourceMapping.Relationships.Any())
             {
@@ -233,7 +234,7 @@ namespace NJsonApi.Serialization
                             {
                                 Id = relatedId,
                                 Type = configuration.GetMapping(relatedInstance.GetType()).ResourceType, // This allows polymorphic (subtyped) resources to be fully represented
-                                MetaData = configuration.GetMapping(relatedInstance.GetType()).GetRelationshipMetadata(relatedInstance)
+                                MetaData = GetRelationshipMetadata(relatedInstance)
                             };
                         else if (relatedId == null || linkMapping.InclusionRule == ResourceInclusionRules.ForceInclude)
                             rel.Data = new NullResourceIdentifier(); // two-state null case, see NullResourceIdentifier summary
@@ -257,7 +258,7 @@ namespace NJsonApi.Serialization
                             {
                                 Id = idGetter(o).ToString(),
                                 Type = configuration.GetMapping(o.GetType()).ResourceType, // This allows polymorphic (subtyped) resources to be fully represented
-                                MetaData = configuration.GetMapping(o.GetType()).GetRelationshipMetadata(o)
+                                MetaData = GetRelationshipMetadata(o)
                             });
                         rel.Data = new MultipleResourceIdentifiers(identifiers);
                     }
@@ -291,5 +292,25 @@ namespace NJsonApi.Serialization
             topLevel.Add("self", new SimpleLink(requestUri));
             return topLevel;
         }
+
+        private MetaData GetObjectMetadata(object objectGraph)
+        {
+            var metadata = (objectGraph as IObjectMetaDataContainer);
+            return metadata?.GetMetaData().Count > 0 ? metadata.GetMetaData() : null;
+        }
+
+        private MetaData GetRelationshipMetadata(object objectGraph)
+        {
+            var metadata = (objectGraph as IRelationshipMetaDataContainer);
+            return metadata?.GetMetaData().Count > 0 ? metadata.GetMetaData() : null;
+        }
+
+        private ILinkData GetObjectLinkData(object objectGraph)
+        {
+            var linkContainer = (objectGraph as IObjectLinkContainer);
+            var linkData = linkContainer?.GetLinks().Count > 0 ? linkContainer.GetLinks() : (ILinkData) new Dictionary<string, ILink>();
+            return linkData;
+        }
+
     }
 }

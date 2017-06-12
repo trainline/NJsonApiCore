@@ -4,10 +4,10 @@ namespace NJsonApi.Serialization
 {
     public interface ILinkBuilder
     {
-        ILink FindResourceSelfLink(Context context, string resourceId, IResourceMapping resourceMapping);
+        ISimpleLink FindResourceSelfLink(Context context, string resourceId, IResourceMapping resourceMapping);
 
-        ILink RelationshipSelfLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping);
+        ISimpleLink RelationshipSelfLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping);
 
-        ILink RelationshipRelatedLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping);
+        ISimpleLink RelationshipRelatedLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping);
     }
 }

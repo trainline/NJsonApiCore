@@ -1,4 +1,5 @@
 ﻿using NJsonApi.Infrastructure;
+using NJsonApi.Serialization.Representations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +47,13 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Models
             article1.MoreComments.Add(comment3);
             article1.MoreComments.Add(comment4);
             article1.GetMetaData().Add("article created", DateTime.Now);
+
+            article1.GetLinks().Add("simplelink", new SimpleLink(new Uri("http://localhost/simplelink")));
+
+            var complexLink = new LinkObject(new Uri("http://localhost/complex/"));
+            complexLink.Meta.Add("linkemeta", "linkmetavalue");
+            article1.GetLinks().Add("complexLink", complexLink);
+
             article1.SingleTag = new Tag { Key = "tag key", Value = "single tag value" };
             article1.MoreTags.Add(new Tag { Key = "tag key (more)", Value = "tag value 1" });
             article1.MoreTags.Add(new Tag { Key = "tag key (more)", Value = "tag value 2" });

@@ -20,6 +20,13 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Controllers
             md.GetMetaData().Add("response created", DateTime.Now);
             md.GetMetaData().Add("response created by", this.GetType());
             md.Links.Add("link1", new SimpleLink(new Uri("http://localhost")));
+
+            md.Links.Add("link2", new SimpleLink(new Uri("http://localhost")));
+
+            var complexLink = new LinkObject(new Uri("http://localhost/complex/"));
+            complexLink.Meta.Add("linkemeta", "linkmetavalue");
+            md.Links.Add("complexLink", complexLink);
+
             return Ok(md);
         }
 
@@ -40,7 +47,15 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Controllers
             var md = new TopLevelDocument<Article>(a);
             md.GetMetaData().Add("response created", DateTime.Now);
             md.GetMetaData().Add("response created by", this.GetType());
+
             md.Links.Add("link1", new SimpleLink(new Uri("http://localhost")));
+
+            md.Links.Add("link2", new SimpleLink(new Uri("http://localhost")));
+
+            var complexLink = new LinkObject(new Uri("http://localhost/complex/"));
+            complexLink.Meta.Add("linkemeta", "linkmetavalue");
+            md.Links.Add("complexLink", complexLink);
+
             return Ok(md);
         }
 

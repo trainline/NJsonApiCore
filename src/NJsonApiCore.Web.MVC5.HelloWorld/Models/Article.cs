@@ -1,10 +1,15 @@
 ﻿using NJsonApi.Infrastructure;
+using NJsonApi.Serialization.Representations;
 using System.Collections.Generic;
+using System;
 
 namespace NJsonApi.Web.MVC5.HelloWorld.Models
 {
-    public class Article : ObjectMetaDataContainer
+    public class Article : IObjectMetaDataContainer, IObjectLinkContainer
     {
+        private ObjectMetaDataContainer _metaDataContainer = new ObjectMetaDataContainer();
+        private ObjectLinkContainer _linkContainer = new ObjectLinkContainer();
+
         public Article()
         {
         }
@@ -17,7 +22,6 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Models
             PublishedInYears = new List<int>();
             Id = StaticPersistentStore.GetNextId();
             Title = title;
-
         }
 
         public int Id { get; set; }
@@ -44,5 +48,15 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Models
 
         // an array of simple types that serializes as an attribute
         public List<int> PublishedInYears { get; set; }
+
+        public ILinkData GetLinks()
+        {
+            return _linkContainer.GetLinks();
+        }
+
+        public MetaData GetMetaData()
+        {
+            return _metaDataContainer.GetMetaData();
+        }
     }
 }

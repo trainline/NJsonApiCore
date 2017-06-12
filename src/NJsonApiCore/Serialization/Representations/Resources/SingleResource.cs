@@ -20,7 +20,7 @@ namespace NJsonApi.Serialization.Representations.Resources
         public Dictionary<string, Relationship> Relationships { get; set; }
 
         [JsonProperty(PropertyName = "links", NullValueHandling = NullValueHandling.Ignore)]
-        public Dictionary<string, ILink> Links { get; set; }
+        public ILinkData Links { get; set; }
 
         [JsonProperty(PropertyName = "meta", NullValueHandling = NullValueHandling.Ignore)]
         public MetaData MetaData { get; set; }
