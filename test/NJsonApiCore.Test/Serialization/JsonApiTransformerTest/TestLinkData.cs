@@ -29,6 +29,8 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
             Assert.NotNull(result.Data);
             var transformedObject = result.Data as SingleResource;
             Assert.NotNull(transformedObject);
+            Assert.Equal(1, transformedObject.Links.Count);
+            Assert.Equal("http://example.com/", ((ISimpleLink)((LinkData)transformedObject.Links)["self"]).Href);
         }
 
         [Fact]
@@ -48,6 +50,28 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
             var transformedObject = result.Data as SingleResource;
             Assert.Equal("url1", ((ISimpleLink)transformedObject.Links["link1"]).Href);
             Assert.Equal("url2", ((ISimpleLink)transformedObject.Links["link2"]).Href);
+        }
+
+        [Fact]
+        public void Creates_CompoundDocument_for_single_class_with_link_objects_and_properly_map_links()
+        {
+            // Arrange
+            var context = CreateContext();
+            SampleClassWithObjectLinks objectToTransform = CreateObjectWithLinkObjectsToTransform();
+            var transformer = new JsonApiTransformerBuilder()
+                .With(CreateConfiguration())
+                .Build();
+
+            // Act
+            CompoundDocument result = transformer.Transform(objectToTransform, context);
+
+            // Assert
+            var transformedObject = result.Data as SingleResource;
+            Assert.Equal("url1", ((ILinkObject)transformedObject.Links["link1"]).Link.Href);
+            Assert.Equal("url2", ((ILinkObject)transformedObject.Links["link2"]).Link.Href);
+
+            Assert.Equal("data1", ((ILinkObject)transformedObject.Links["link1"]).Meta["meta1"]);
+            Assert.Equal("data2", ((ILinkObject)transformedObject.Links["link2"]).Meta["meta2"]);
         }
 
         private static SampleClass CreateObjectToTransform()
@@ -70,6 +94,23 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
             };
             o.GetLinks().Add("link1", new SimpleLink { Href = "url1" });
             o.GetLinks().Add("link2", new SimpleLink { Href = "url2" });
+            return o;
+        }
+
+        private static SampleClassWithObjectLinks CreateObjectWithLinkObjectsToTransform()
+        {
+            var o = new SampleClassWithObjectLinks
+            {
+                Id = 1,
+                SomeValue = "Somevalue text test string"
+            };
+            var meta1 = new MetaData();
+            meta1.Add("meta1", "data1");
+            var meta2 = new MetaData();
+            meta2.Add("meta2", "data2");
+
+            o.GetLinks().Add("link1", new LinkObject { Link = new SimpleLink { Href = "url1" }, Meta = meta1 });
+            o.GetLinks().Add("link2", new LinkObject { Link = new SimpleLink { Href = "url2" }, Meta = meta2 });
             return o;
         }
 
