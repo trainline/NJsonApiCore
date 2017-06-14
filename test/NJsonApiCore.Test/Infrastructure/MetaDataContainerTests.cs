@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using NJsonApi.Infrastructure;
+﻿using NJsonApi.Infrastructure;
 using Xunit;
 
 namespace NJsonApi.Test.Infrastructure

@@ -17,7 +17,7 @@ namespace NJsonApi.Web.MVCCore.Serialization
             this.descriptionProvider = descriptionProvider;
         }
 
-        public ILink FindResourceSelfLink(Context context, string resourceId, IResourceMapping resourceMapping)
+        public ISimpleLink FindResourceSelfLink(Context context, string resourceId, IResourceMapping resourceMapping)
         {
             var actions = descriptionProvider.From(resourceMapping.Controller).Items;
 
@@ -31,14 +31,14 @@ namespace NJsonApi.Web.MVCCore.Serialization
             return ToUrl(context, action, values);
         }
 
-        public ILink RelationshipRelatedLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping)
+        public ISimpleLink RelationshipRelatedLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping)
         {
             var selfLink = FindResourceSelfLink(context, resourceId, resourceMapping).Href;
             var completeLink = $"{selfLink}/{linkMapping.RelationshipName}";
             return new SimpleLink(new Uri(completeLink));
         }
 
-        public ILink RelationshipSelfLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping)
+        public ISimpleLink RelationshipSelfLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping)
         {
             var selfLink = FindResourceSelfLink(context, resourceId, resourceMapping).Href;
             var completeLink = $"{selfLink}/relationships/{linkMapping.RelationshipName}";

@@ -10,7 +10,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
     public class TestSerialization
     {
         [Fact]
-        public void Serilized_properly()
+        public void Serialized_properly()
         {
             // Arrange
             var context = CreateContext();
