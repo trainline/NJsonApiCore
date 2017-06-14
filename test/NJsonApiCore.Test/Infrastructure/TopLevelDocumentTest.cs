@@ -50,7 +50,7 @@ namespace NJsonApi.Test.Infrastructure
         }
 
         [Fact]
-        public void TopLevelDocument_add_links_ok()
+        public void TopLevelDocument_add_simple_links_ok()
         {
             // Arrange
             const string testString = "Test String";
@@ -62,6 +62,24 @@ namespace NJsonApi.Test.Infrastructure
 
             // Assert
             Assert.Same(link, sut.Links["link1"]);
+        }
+
+        [Fact]
+        public void TopLevelDocument_add_link_objects_ok()
+        {
+            // Arrange
+            const string testString = "Test String";
+            var meta = new MetaData();
+            meta.Add("about", "this");
+            var link = new SimpleLink();
+            var linkObject = new LinkObject { Link = link, Meta = meta };
+
+            // Act
+            var sut = new TopLevelDocument<string>(testString);
+            sut.Links.Add("link2", linkObject);
+
+            // Assert
+            Assert.Same(linkObject, sut.Links["link2"]);
         }
     }
 }

@@ -6,7 +6,6 @@ using NJsonApi.Test.TestControllers;
 using System;
 using System.Collections.Generic;
 using Xunit;
-using Newtonsoft.Json;
 using NJsonApi.Serialization.Representations.Relationships;
 using NJsonApi.Serialization.Representations;
 
@@ -15,7 +14,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
     public class TestMetaData
     {
         [Fact]
-        public void Creates_CompondDocument_for_single_class_with_nometadata_and_propertly_map_nometadata()
+        public void Creates_CompoundDocument_for_single_class_with_nometadata_and_properly_map_nometadata()
         {
             // Arrange
             var context = CreateContext();
@@ -33,7 +32,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_single_class_with_metadata_and_propertly_map_metadata()
+        public void Creates_CompoundDocument_for_single_class_with_metadata_and_properly_map_metadata()
         {
             // Arrange
             var context = CreateContext();
@@ -52,7 +51,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_single_class_with_relationship_metadata_and_propertly_map_metadata()
+        public void Creates_CompoundDocument_for_single_class_with_relationship_metadata_and_properly_map_metadata()
         {
             // Arrange
             var context = CreateContext();

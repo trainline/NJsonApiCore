@@ -1,6 +1,4 @@
-﻿using NJsonApi.Infrastructure;
-
-namespace NJsonApi.Infrastructure
+﻿namespace NJsonApi.Infrastructure
 {
     public interface IObjectMetaDataContainer
     {

@@ -14,7 +14,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
     public class TestCollection
     {
         [Fact]
-        public void Creates_CompondDocument_for_collection_not_nested_class_and_propertly_map_resourceName()
+        public void Creates_CompoundDocument_for_collection_not_nested_class_and_properly_map_resourceName()
         {
             // Arrange
             var context = CreateContext();
@@ -33,7 +33,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_collection_not_nested_single_class()
+        public void Creates_CompoundDocument_for_collection_not_nested_single_class()
         {
             // Arrange
             var configuration = CreateContext();
@@ -52,7 +52,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_collection_not_nested_class_and_propertly_map_id()
+        public void Creates_CompoundDocument_for_collection_not_nested_class_and_properly_map_id()
         {
             // Arrange
             var configuration = CreateContext();
@@ -71,7 +71,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_collection_not_nested_class_and_propertly_map_properties()
+        public void Creates_CompoundDocument_for_collection_not_nested_class_and_properly_map_properties()
         {
             // Arrange
             var context = CreateContext();
@@ -99,7 +99,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
 
 
         [Fact]
-        public void Creates_CompondDocument_for_collection_not_nested_class_and_propertly_map_type()
+        public void Creates_CompoundDocument_for_collection_not_nested_class_and_properly_map_type()
         {
             // Arrange
             var configuration = CreateContext();
@@ -118,7 +118,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_collectione_of_TopLevelDocument_throws_notSupportedException()
+        public void Creates_CompoundDocument_for_collection_of_TopLevelDocument_throws_notSupportedException()
         {
             // Arrange
             var configuration = CreateContext();

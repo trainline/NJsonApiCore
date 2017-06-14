@@ -20,7 +20,7 @@ namespace NJsonApi.Web.MVC5.Serialization
             this.descriptionProvider = descriptionProvider;
         }
 
-        public ILink FindResourceSelfLink(Context context, string resourceId, IResourceMapping resourceMapping)
+        public ISimpleLink FindResourceSelfLink(Context context, string resourceId, IResourceMapping resourceMapping)
         {
             var actions = descriptionProvider.From(resourceMapping.Controller);
 
@@ -34,7 +34,7 @@ namespace NJsonApi.Web.MVC5.Serialization
         }
 
         // TODO - Move into NJsonApiCore base library from here and .mVC6
-        public ILink RelationshipRelatedLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping)
+        public ISimpleLink RelationshipRelatedLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping)
         {
             var selfLink = FindResourceSelfLink(context, resourceId, resourceMapping).Href;
             var completeLink = $"{selfLink}/{linkMapping.RelationshipName}";
@@ -42,7 +42,7 @@ namespace NJsonApi.Web.MVC5.Serialization
         }
 
         // TODO - Move into NJsonApiCore base library from here and .mVC6
-        public ILink RelationshipSelfLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping)
+        public ISimpleLink RelationshipSelfLink(Context context, string resourceId, IResourceMapping resourceMapping, IRelationshipMapping linkMapping)
         {
             var selfLink = FindResourceSelfLink(context, resourceId, resourceMapping).Href;
             var completeLink = $"{selfLink}/relationships/{linkMapping.RelationshipName}";

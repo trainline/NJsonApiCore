@@ -5,18 +5,16 @@ using NJsonApi.Test.Builders;
 using NJsonApi.Test.TestModel;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NJsonApiCore.Test.TestModel;
 using Xunit;
+using NJsonApi.Serialization.Representations;
 
 namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
 {
     public class TestTransformBack
     {
         [Fact]
-        public void Transform_properties_with_reserverd_keyword()
+        public void Transform_properties_with_reserved_keyword()
         {
             var updateDocument = new UpdateDocument()
             {

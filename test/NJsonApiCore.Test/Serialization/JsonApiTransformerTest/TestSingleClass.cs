@@ -1,5 +1,4 @@
-﻿using NJsonApi.Infrastructure;
-using NJsonApi.Serialization.Documents;
+﻿using NJsonApi.Serialization.Documents;
 using NJsonApi.Serialization.Representations.Resources;
 using NJsonApi.Test.Builders;
 using NJsonApi.Test.TestControllers;
@@ -13,7 +12,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
     public class TestSingleClass
     {
         [Fact]
-        public void Creates_CompondDocument_for_single_not_nested_class_and_propertly_map_resourceName()
+        public void Creates_CompoundDocument_for_single_not_nested_class_and_properly_map_resourceName()
         {
             // Arrange
             var context = CreateContext();
@@ -32,7 +31,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_single_not_nested_class_and_propertly_map_id()
+        public void Creates_CompoundDocument_for_single_not_nested_class_and_properly_map_id()
         {
             // Arrange
             var context = CreateContext();
@@ -50,7 +49,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_single_not_nested_class_and_propertly_map_properties()
+        public void Creates_CompoundDocument_for_single_not_nested_class_and_properly_map_properties()
         {
             // Arrange
             var context = CreateContext();
@@ -70,7 +69,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_single_not_nested_class_and_propertly_map_type()
+        public void Creates_CompoundDocument_for_single_not_nested_class_and_properly_map_type()
         {
             // Arrange
             var context = CreateContext();
@@ -130,7 +129,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_single_derived_class_and_propertly_map_type()
+        public void Creates_CompoundDocument_for_single_derived_class_and_properly_map_type()
         {
             // Arrange
             var context = CreateContext();
