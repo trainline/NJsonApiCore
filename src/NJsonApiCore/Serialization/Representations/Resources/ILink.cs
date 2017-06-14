@@ -1,6 +1,6 @@
 ﻿using NJsonApi.Infrastructure;
 using System.Collections.Generic;
-using System;
+using System; 
 
 namespace NJsonApi.Serialization.Representations
 {
