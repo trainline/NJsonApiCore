@@ -8,7 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using NJsonApi.Utils;
 
 namespace NJsonApi.Serialization
 {
@@ -308,7 +307,7 @@ namespace NJsonApi.Serialization
         private ILinkData GetObjectLinkData(object objectGraph)
         {
             var linkContainer = (objectGraph as IObjectLinkContainer);
-            var linkData = linkContainer?.GetLinks().Count > 0 ? linkContainer.GetLinks() : (ILinkData) new Dictionary<string, ILink>();
+            var linkData = linkContainer?.GetLinks().Count > 0 ? linkContainer.GetLinks() : new LinkData();
             return linkData;
         }
 

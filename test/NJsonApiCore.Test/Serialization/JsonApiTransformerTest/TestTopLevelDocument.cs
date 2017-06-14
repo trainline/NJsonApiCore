@@ -5,7 +5,6 @@ using NJsonApi.Serialization.Representations.Resources;
 using NJsonApi.Test.Builders;
 using NJsonApi.Test.TestControllers;
 using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
@@ -13,7 +12,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
     public class TestTopLevelDocument
     {
         [Fact]
-        public void Creates_CompondDocument_for_TopLevelDocument_single_not_nested_class_and_propertly_map_resourceName()
+        public void Creates_CompoundDocument_for_TopLevelDocument_single_not_nested_class_and_properly_map_resourceName()
         {
             // Arrange
             var context = CreateContext();
@@ -32,7 +31,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_TopLevelDocument_single_not_nested_class_and_propertly_map_id()
+        public void Creates_CompoundDocument_for_TopLevelDocument_single_not_nested_class_and_properly_map_id()
         {
             // Arrange
             var context = CreateContext();
@@ -50,7 +49,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_TopLevelDocument_single_not_nested_class_and_propertly_map_properties()
+        public void Creates_CompoundDocument_for_TopLevelDocument_single_not_nested_class_and_properly_map_properties()
         {
             // Arrange
             var context = CreateContext();
@@ -70,7 +69,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_TopLevelDocument_single_not_nested_class_and_propertly_map_type()
+        public void Creates_CompoundDocument_for_TopLevelDocument_single_not_nested_class_and_properly_map_type()
         {
             // Arrange
             var context = CreateContext();
@@ -88,7 +87,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_TopLevelDocument_single_not_nested_class_and_propertly_map_metadata()
+        public void Creates_CompoundDocument_for_TopLevelDocument_single_not_nested_class_and_properly_map_metadata()
         {
             // Arrange
             const string pagingValue = "1";
@@ -112,7 +111,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
         }
 
         [Fact]
-        public void Creates_CompondDocument_for_TopLevelDocument_single_not_nested_class_and_propertly_map_links()
+        public void Creates_CompoundDocument_for_TopLevelDocument_single_not_nested_class_and_properly_map_links()
         {
             // Arrange
             SimpleLink linkSome = new SimpleLink(new Uri("http://somehost/"));

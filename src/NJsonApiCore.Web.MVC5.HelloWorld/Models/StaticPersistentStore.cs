@@ -51,7 +51,7 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Models
             article1.GetLinks().Add("simplelink", new SimpleLink(new Uri("http://localhost/simplelink")));
 
             var complexLink = new LinkObject(new Uri("http://localhost/complex/"));
-            complexLink.Meta.Add("linkemeta", "linkmetavalue");
+            complexLink.Meta.Add("linkmeta", "linkmetavalue");
             article1.GetLinks().Add("complexLink", complexLink);
 
             article1.SingleTag = new Tag { Key = "tag key", Value = "single tag value" };

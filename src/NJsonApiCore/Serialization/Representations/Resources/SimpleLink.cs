@@ -30,7 +30,7 @@ namespace NJsonApi.Serialization.Representations
         private MetaData _meta = new MetaData();
 
         [JsonProperty(PropertyName = "href", NullValueHandling = NullValueHandling.Ignore)]
-        public ISimpleLink Href { get; set; }
+        public ISimpleLink Link { get; set; }
 
         [JsonProperty(PropertyName = "meta", NullValueHandling = NullValueHandling.Ignore)]
         public MetaData Meta { get { return _meta; } set { _meta = value; } }
@@ -41,7 +41,7 @@ namespace NJsonApi.Serialization.Representations
 
         public LinkObject(Uri href)
         {
-            this.Href = new SimpleLink(href);
+            this.Link = new SimpleLink(href);
         }
 
         public MetaData GetMetaData()

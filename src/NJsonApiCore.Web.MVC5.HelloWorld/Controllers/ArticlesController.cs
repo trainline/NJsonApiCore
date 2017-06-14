@@ -24,7 +24,7 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Controllers
             md.Links.Add("link2", new SimpleLink(new Uri("http://localhost")));
 
             var complexLink = new LinkObject(new Uri("http://localhost/complex/"));
-            complexLink.Meta.Add("linkemeta", "linkmetavalue");
+            complexLink.Meta.Add("linkmeta", "linkmetavalue");
             md.Links.Add("complexLink", complexLink);
 
             return Ok(md);
@@ -53,7 +53,7 @@ namespace NJsonApi.Web.MVC5.HelloWorld.Controllers
             md.Links.Add("link2", new SimpleLink(new Uri("http://localhost")));
 
             var complexLink = new LinkObject(new Uri("http://localhost/complex/"));
-            complexLink.Meta.Add("linkemeta", "linkmetavalue");
+            complexLink.Meta.Add("linkmeta", "linkmetavalue");
             md.Links.Add("complexLink", complexLink);
 
             return Ok(md);
