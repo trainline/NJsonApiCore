@@ -59,6 +59,13 @@ namespace NJsonApi
             return mapping;
         }
 
+        public IResourceMapping GetMapping(string resourceType)
+        {
+            IResourceMapping mapping;
+            resourcesMappingsByResourceType.TryGetValue(resourceType, out mapping);
+            return mapping;
+        }
+
         public IResourceMapping GetMapping(object objectGraph)
         {
             return GetMapping(Reflection.GetObjectType(objectGraph));
