@@ -25,6 +25,8 @@ namespace NJsonApi.Test.Configuration
             // Assert
             Assert.True(conf.IsResourceRegistered(typeof(Post)));
             Assert.NotNull(conf.GetMapping(typeof(Post)));
+            Assert.NotNull(conf.GetMapping("posts"));
+
             Assert.False(conf.IsResourceRegistered(typeof(Author)));
             Assert.Null(conf.GetMapping(typeof(Author)));
         }

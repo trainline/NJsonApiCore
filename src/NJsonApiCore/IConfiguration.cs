@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 
 namespace NJsonApi
 {
@@ -11,6 +10,8 @@ namespace NJsonApi
         void AddMapping(IResourceMapping resourceMapping);
 
         IResourceMapping GetMapping(Type type);
+
+        IResourceMapping GetMapping(string resourceType);
 
         IResourceMapping GetMapping(object objectGraph);
 
