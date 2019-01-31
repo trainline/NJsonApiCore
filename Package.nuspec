@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>NJsonApiCore</id>
-    <version>1.0.7</version>
+    <version>1.0.8</version>
     <authors>Rob Lang</authors>
     <owners>Rob Lang</owners>
     <projectUrl>http://brainwipe.github.io/NJsonApiCore</projectUrl>
@@ -34,7 +34,7 @@
   <files>
     <file src="artifacts\src\NJsonApiCore.Web.MVC5\bin\release\net452\NJsonApiCore.dll" target="lib/net452" />
     <file src="artifacts\src\NJsonApiCore.Web.MVC5\bin\release\net452\NJsonApiCore.Web.MVC5.dll" target="lib/net452" />
-    <file src="artifacts\src\NJsonApiCore.Web.MVCCore\bin\Release\netcoreapp1.0\NJsonApiCore.dll" target="lib/dotnet" />
-    <file src="artifacts\src\NJsonApiCore.Web.MVCCore\bin\Release\netcoreapp1.0\NJsonApiCore.Web.MVCCore.dll" target="lib/dotnet" />
+    <file src="artifacts\src\NJsonApiCore.Web.MVCCore\bin\Release\netstandard1.6\NJsonApiCore.dll" target="lib/dotnet" />
+    <file src="artifacts\src\NJsonApiCore.Web.MVCCore\bin\Release\netstandard1.6\NJsonApiCore.Web.MVCCore.dll" target="lib/dotnet" />
   </files>
 </package>

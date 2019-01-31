@@ -10,28 +10,11 @@ namespace NJsonApi.Utils
 {
     public static class ExpressionUtils
     {
-#if (NETCOREAPP1_0)
         // JObject.ToObject(value) method info
         private static readonly MethodInfo JObjectToObjectMethodInfo =
             typeof(JObject).GetMethods().Single(x => x.Name == "ToObject" && !x.ContainsGenericParameters && x.GetParameters().Length == 1);
         private static readonly MethodInfo JArrayToObjectMethodInfo =
             typeof(JArray).GetMethods().Single(x => x.Name == "ToObject" && !x.ContainsGenericParameters && x.GetParameters().Length == 1);
-#else
-        // JObject.ToObject(value) method info
-        private static readonly MethodInfo JObjectToObjectMethodInfo =
-            typeof(JObject).GetMethod("ToObject",
-            BindingFlags.Instance | BindingFlags.Public,
-            null,
-            CallingConventions.HasThis,
-            new[] { typeof(Type) }, null);
-
-        private static readonly MethodInfo JArrayToObjectMethodInfo =
-            typeof(JArray).GetMethod("ToObject",
-            BindingFlags.Instance | BindingFlags.Public,
-            null,
-            CallingConventions.HasThis,
-            new[] { typeof(Type) }, null);
-#endif
 
         public static PropertyInfo GetPropertyInfo(this LambdaExpression propertyExpression)
         {
