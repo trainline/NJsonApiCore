@@ -6,7 +6,7 @@
     <AssemblyName>NJsonApiCore.Web.MVCCore.HelloWorld</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>NJsonApiCore.Web.MVCCore.HelloWorld</PackageId>
-    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
+    
   </PropertyGroup>
 
   <ItemGroup>
