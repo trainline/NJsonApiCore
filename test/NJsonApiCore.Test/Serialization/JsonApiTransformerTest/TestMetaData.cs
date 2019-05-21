@@ -48,6 +48,7 @@ namespace NJsonApi.Test.Serialization.JsonApiTransformerTest
             var transformedObject = result.Data as SingleResource;
             Assert.Equal("value1", transformedObject.MetaData["meta1"]);
             Assert.Equal("value2", transformedObject.MetaData["meta2"]);
+            Assert.Null(result.Meta);
         }
 
         [Fact]

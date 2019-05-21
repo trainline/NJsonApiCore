@@ -164,11 +164,11 @@ namespace NJsonApi.Serialization
             return objectGraph;
         }
 
-        public IMetaData GetMetadata(object objectGraph)
+        public IMetaData GetTopLevelMetadata(object objectGraph)
         {
-            if (objectGraph is IObjectMetaDataContainer)
+            if (objectGraph is ITopLevelDocument)
             {
-                var metaDataContainer = objectGraph as IObjectMetaDataContainer;
+                var metaDataContainer = objectGraph as ITopLevelDocument;
                 return metaDataContainer.GetMetaData();
             }
             return null;
